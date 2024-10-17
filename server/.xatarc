@@ -1,6 +1,6 @@
 {
-  "databaseURL": "https://GICHUKI-KAMAU-s-workspace-fhao0l.us-east-1.xata.sh/db/project1",
+  "databaseURL": "https://Dominic-Mburu-s-workspace-htrnrt.ap-southeast-2.xata.sh/db/TaskDB",
   "codegen": {
-    "output": "xata.ts"
+    "output": "src/xata.ts"
   }
 }
