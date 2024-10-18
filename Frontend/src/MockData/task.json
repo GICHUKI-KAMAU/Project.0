@@ -1,0 +1,141 @@
+{
+    "users": [
+      {
+        "id": "1",
+        "name": "John Doe",
+        "email": "john@example.com",
+        "password": "hashed_password",
+        "role": "admin",
+        "teams": [
+          {
+            "teamId": "1",
+            "name": "Development Team"
+          }
+        ]
+      },
+      {
+        "id": "2",
+        "name": "Jane Smith",
+        "email": "jane@example.com",
+        "password": "hashed_password",
+        "role": "team_member",
+        "teams": [
+          {
+            "teamId": "1",
+            "name": "Development Team"
+          }
+        ]
+      }
+    ],
+    "teams": [
+      {
+        "id": "1",
+        "name": "Development Team",
+        "description": "Team working on website development",
+        "adminId": "1",
+        "projects": [
+          {
+            "projectId": "101",
+            "name": "Task Management App"
+          }
+        ]
+      },
+      {
+        "id": "2",
+        "name": "Marketing Team",
+        "description": "Marketing tasks and strategies",
+        "adminId": "2",
+        "projects": []
+      }
+    ],
+    "projects": [
+      {
+        "id": "101",
+        "name": "Task Management App",
+        "teamId": "1",
+        "tasks": [
+          {
+            "taskId": "1001",
+            "description": "Design user interface",
+            "status": "in-progress",
+            "dueDate": "2024-11-01",
+            "assignedToId": "2",
+            "comments": [
+              {
+                "commentId": "201",
+                "content": "We should simplify the design",
+                "userId": "2"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "tasks": [
+      {
+        "id": "1001",
+        "description": "Design user interface",
+        "status": "in-progress",
+        "dueDate": "2024-11-01",
+        "projectId": "101",
+        "assignedToId": "2",
+        "comments": [
+          {
+            "id": "201",
+            "content": "We should simplify the design",
+            "taskId": "1001",
+            "userId": "2"
+          }
+        ]
+      }
+    ],
+    "comments": [
+      {
+        "id": "201",
+        "content": "We should simplify the design",
+        "taskId": "1001",
+        "userId": "2"
+      }
+    ],
+    "notifications": [
+      {
+        "id": "3001",
+        "userId": "1",
+        "message": "Task deadline for 'Design user interface' is approaching.",
+        "isRead": false
+      }
+    ],
+    "auth_routes": {
+      "/auth/register": "POST",
+      "/auth/login": "POST"
+    },
+    "team_routes": {
+      "/teams": {
+        "methods": ["POST", "GET", "PATCH", "DELETE"],
+        "actions": ["Create Team", "Update Team", "Join Team", "Leave Team"]
+      }
+    },
+    "project_routes": {
+      "/projects": {
+        "methods": ["POST", "GET", "PATCH", "DELETE"],
+        "actions": ["Create Project", "Update Project", "Delete Project", "View Projects"]
+      }
+    },
+    "task_routes": {
+      "/tasks": {
+        "methods": ["POST", "GET", "PATCH", "DELETE"],
+        "actions": ["Create Task", "Update Task", "Delete Task", "View Tasks", "Assign Task"]
+      }
+    },
+    "comment_routes": {
+      "/comments": {
+        "methods": ["POST", "GET"],
+        "actions": ["Add Comment", "View Comments"]
+      }
+    },
+    "middleware": {
+      "authentication": "JWT Authentication",
+      "authorization": "Role-based Access Control"
+    }
+  }
+  
