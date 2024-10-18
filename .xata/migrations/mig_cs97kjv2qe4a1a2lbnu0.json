@@ -1,0 +1,20 @@
+{
+  "done": true,
+  "migration": {
+    "name": "mig_cs97kjv2qe4a1a2lbnu0",
+    "operations": [
+      {
+        "drop_column": {
+          "down": "0",
+          "table": "Users",
+          "column": "ID"
+        }
+      }
+    ]
+  },
+  "migrationType": "pgroll",
+  "name": "mig_cs97kjv2qe4a1a2lbnu0",
+  "parent": "mig_cs97kgn2qe4a1a2lbnt0",
+  "schema": "public",
+  "startedAt": "2024-10-18T15:10:08.58117Z"
+}
