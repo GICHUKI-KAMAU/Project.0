@@ -1,6 +1,6 @@
 {
   "databaseURL": "https://GICHUKI-KAMAU-s-workspace-fhao0l.us-east-1.xata.sh/db/project1",
   "codegen": {
-    "output": "xata.ts"
+    "output": "src/xata.ts"
   }
 }
