@@ -1,0 +1,22 @@
+{
+  "done": true,
+  "migration": {
+    "name": "mig_cs8g66v2qe4a1a2lbfdg",
+    "operations": [
+      {
+        "drop_constraint": {
+          "up": "\"password\"",
+          "down": "\"password\"",
+          "name": "Users__pgroll_new_password_key",
+          "table": "Users",
+          "column": "password"
+        }
+      }
+    ]
+  },
+  "migrationType": "pgroll",
+  "name": "mig_cs8g66v2qe4a1a2lbfdg",
+  "parent": "mig_cs8g5mn2qe4a1a2lbfcg",
+  "schema": "public",
+  "startedAt": "2024-10-17T12:29:16.032425Z"
+}
