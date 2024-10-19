@@ -1,0 +1,91 @@
+{
+    "users": [
+      {
+        "id": "1",
+        "name": "John Doe",
+        "email": "john@example.com",
+        "password": "$2a$10$somethingHashed",
+        "role": "admin"
+      },
+      {
+        "id": "2",
+        "name": "Jane Smith",
+        "email": "jane@example.com",
+        "password": "$2a$10$somethingHashed",
+        "role": "team_member"
+      }
+    ],
+    "teams": [
+      {
+        "id": "1",
+        "name": "Development Team",
+        "description": "Team working on website development",
+        "adminId": "1"
+      },
+      {
+        "id": "2",
+        "name": "Marketing Team",
+        "description": "Marketing tasks and strategies",
+        "adminId": "2"
+      }
+    ],
+    "projects": [
+      {
+        "id": "101",
+        "name": "Task Management App",
+        "teamId": "1"
+      },
+      {
+        "id": "102",
+        "name": "Website Redesign",
+        "teamId": "1"
+      }
+    ],
+    "tasks": [
+      {
+        "id": "1001",
+        "description": "Design user interface",
+        "status": "in-progress",
+        "dueDate": "2024-11-01",
+        "projectId": "101",
+        "assignedToId": "2"
+      },
+      {
+        "id": "1002",
+        "description": "Write project documentation",
+        "status": "completed",
+        "dueDate": "2024-10-10",
+        "projectId": "101",
+        "assignedToId": "1"
+      }
+    ],
+    "comments": [
+      {
+        "id": "201",
+        "content": "We should simplify the design.",
+        "taskId": "1001",
+        "userId": "2"
+      },
+      {
+        "id": "202",
+        "content": "Documentation complete.",
+        "taskId": "1002",
+        "userId": "1"
+      }
+    ],
+    "notifications": [
+      {
+        "id": "3001",
+        "userId": "1",
+        "message": "Task deadline for 'Design user interface' is approaching.",
+        "isRead": false
+      },
+      {
+        "id": "3002",
+        "userId": "2",
+        "message": "You have been assigned a new task: 'Write project documentation'.",
+        "isRead": true
+      }
+    ]
+  }
+  

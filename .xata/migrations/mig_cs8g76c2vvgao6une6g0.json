@@ -1,0 +1,22 @@
+{
+  "done": true,
+  "migration": {
+    "name": "mig_cs8g76c2vvgao6une6g0",
+    "operations": [
+      {
+        "alter_column": {
+          "up": "(SELECT CASE WHEN \"description\" IS NULL THEN '' ELSE \"description\" END)",
+          "down": "(SELECT CASE WHEN \"description\" IS NULL THEN '' ELSE \"description\" END)",
+          "table": "team",
+          "column": "description",
+          "nullable": false
+        }
+      }
+    ]
+  },
+  "migrationType": "pgroll",
+  "name": "mig_cs8g76c2vvgao6une6g0",
+  "parent": "mig_cs8g7072qe4a1a2lbfig",
+  "schema": "public",
+  "startedAt": "2024-10-17T12:31:21.872624Z"
+}

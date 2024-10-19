@@ -1,10 +1,19 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import App from './App.tsx'
-import './index.css'
+import ReactDOM from "react-dom/client";
+import App from "./App";
+import { ThemeProvider } from "./context/ThemeContext";
+import { SidebarProvider } from "./context/SidebarContext";
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+// Ensure the root element exists and is typed correctly
+const rootElement = document.getElementById("root");
+
+if (rootElement) {
+  ReactDOM.createRoot(rootElement).render(
+    <ThemeProvider>
+      <SidebarProvider>
+        <App />
+      </SidebarProvider>
+    </ThemeProvider>
+  );
+} else {
+  console.error("Root element not found");
+}

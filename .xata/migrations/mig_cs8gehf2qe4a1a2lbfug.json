@@ -1,0 +1,20 @@
+{
+  "done": true,
+  "migration": {
+    "name": "mig_cs8gehf2qe4a1a2lbfug",
+    "operations": [
+      {
+        "alter_column": {
+          "name": "name",
+          "table": "team",
+          "column": "username"
+        }
+      }
+    ]
+  },
+  "migrationType": "pgroll",
+  "name": "mig_cs8gehf2qe4a1a2lbfug",
+  "parent": "mig_cs8gdbf2qe4a1a2lbftg",
+  "schema": "public",
+  "startedAt": "2024-10-17T12:47:02.203344Z"
+}
