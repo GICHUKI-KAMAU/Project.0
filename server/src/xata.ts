@@ -5,6 +5,10 @@ import type {
   SchemaInference,
   XataRecord,
 } from "@xata.io/client";
+import dotenv from 'dotenv';
+
+dotenv.config();
+
 
 const tables = [
   {
@@ -19,10 +23,6 @@ const tables = [
     foreignKeys: {},
     primaryKey: [],
     uniqueConstraints: {
-      Users__pgroll_new_ID_key: {
-        name: "Users__pgroll_new_ID_key",
-        columns: ["ID"],
-      },
       Users__pgroll_new_email_key: {
         name: "Users__pgroll_new_email_key",
         columns: ["email"],
@@ -37,14 +37,6 @@ const tables = [
       },
     },
     columns: [
-      {
-        name: "ID",
-        type: "int",
-        notNull: true,
-        unique: true,
-        defaultValue: null,
-        comment: "",
-      },
       {
         name: "email",
         type: "text",
@@ -120,27 +112,30 @@ const tables = [
         definition: "CHECK ((length(xata_id) < 256))",
       },
     },
-    foreignKeys: {},
+    foreignKeys: {
+      taskId_link: {
+        name: "taskId_link",
+        columns: ["taskId"],
+        referencedTable: "task",
+        referencedColumns: ["xata_id"],
+        onDelete: "SET NULL",
+      },
+      userId_link: {
+        name: "userId_link",
+        columns: ["userId"],
+        referencedTable: "Users",
+        referencedColumns: ["xata_id"],
+        onDelete: "SET NULL",
+      },
+    },
     primaryKey: [],
     uniqueConstraints: {
       _pgroll_new_comment_xata_id_key: {
         name: "_pgroll_new_comment_xata_id_key",
         columns: ["xata_id"],
       },
-      comment__pgroll_new_ID_key: {
-        name: "comment__pgroll_new_ID_key",
-        columns: ["ID"],
-      },
     },
     columns: [
-      {
-        name: "ID",
-        type: "int",
-        notNull: true,
-        unique: true,
-        defaultValue: null,
-        comment: "",
-      },
       {
         name: "comment",
         type: "text",
@@ -148,6 +143,24 @@ const tables = [
         unique: false,
         defaultValue: null,
         comment: "",
+      },
+      {
+        name: "taskId",
+        type: "link",
+        link: { table: "task" },
+        notNull: true,
+        unique: false,
+        defaultValue: null,
+        comment: '{"xata.link":"task"}',
+      },
+      {
+        name: "userId",
+        type: "link",
+        link: { table: "Users" },
+        notNull: true,
+        unique: false,
+        defaultValue: null,
+        comment: '{"xata.link":"Users"}',
       },
       {
         name: "xata_createdat",
@@ -192,16 +205,20 @@ const tables = [
         definition: "CHECK ((length(xata_id) < 256))",
       },
     },
-    foreignKeys: {},
+    foreignKeys: {
+      team_ID_link: {
+        name: "team_ID_link",
+        columns: ["team_ID"],
+        referencedTable: "team",
+        referencedColumns: ["xata_id"],
+        onDelete: "SET NULL",
+      },
+    },
     primaryKey: [],
     uniqueConstraints: {
       _pgroll_new_project_xata_id_key: {
         name: "_pgroll_new_project_xata_id_key",
         columns: ["xata_id"],
-      },
-      project__pgroll_new_ID_key: {
-        name: "project__pgroll_new_ID_key",
-        columns: ["ID"],
       },
       project__pgroll_new_name_key: {
         name: "project__pgroll_new_name_key",
@@ -210,20 +227,21 @@ const tables = [
     },
     columns: [
       {
-        name: "ID",
-        type: "int",
-        notNull: true,
-        unique: true,
-        defaultValue: null,
-        comment: "",
-      },
-      {
         name: "name",
         type: "text",
         notNull: true,
         unique: true,
         defaultValue: null,
         comment: "",
+      },
+      {
+        name: "team_ID",
+        type: "link",
+        link: { table: "team" },
+        notNull: true,
+        unique: false,
+        defaultValue: null,
+        comment: '{"xata.link":"team"}',
       },
       {
         name: "xata_createdat",
@@ -268,26 +286,38 @@ const tables = [
         definition: "CHECK ((length(xata_id) < 256))",
       },
     },
-    foreignKeys: {},
+    foreignKeys: {
+      AssignedToId_link: {
+        name: "AssignedToId_link",
+        columns: ["AssignedToId"],
+        referencedTable: "Users",
+        referencedColumns: ["xata_id"],
+        onDelete: "SET NULL",
+      },
+      project_id_link: {
+        name: "project_id_link",
+        columns: ["project_id"],
+        referencedTable: "project",
+        referencedColumns: ["xata_id"],
+        onDelete: "SET NULL",
+      },
+    },
     primaryKey: [],
     uniqueConstraints: {
       _pgroll_new_task_xata_id_key: {
         name: "_pgroll_new_task_xata_id_key",
         columns: ["xata_id"],
       },
-      task__pgroll_new_ID_key: {
-        name: "task__pgroll_new_ID_key",
-        columns: ["ID"],
-      },
     },
     columns: [
       {
-        name: "ID",
-        type: "int",
+        name: "AssignedToId",
+        type: "link",
+        link: { table: "Users" },
         notNull: true,
-        unique: true,
+        unique: false,
         defaultValue: null,
-        comment: "",
+        comment: '{"xata.link":"Users"}',
       },
       {
         name: "description",
@@ -304,6 +334,15 @@ const tables = [
         unique: false,
         defaultValue: null,
         comment: "",
+      },
+      {
+        name: "project_id",
+        type: "link",
+        link: { table: "project" },
+        notNull: true,
+        unique: false,
+        defaultValue: null,
+        comment: '{"xata.link":"project"}',
       },
       {
         name: "status",
@@ -356,16 +395,20 @@ const tables = [
         definition: "CHECK ((length(xata_id) < 256))",
       },
     },
-    foreignKeys: {},
+    foreignKeys: {
+      team_lead_link: {
+        name: "team_lead_link",
+        columns: ["team_lead"],
+        referencedTable: "Users",
+        referencedColumns: ["xata_id"],
+        onDelete: "SET NULL",
+      },
+    },
     primaryKey: [],
     uniqueConstraints: {
       _pgroll_new_team_xata_id_key: {
         name: "_pgroll_new_team_xata_id_key",
         columns: ["xata_id"],
-      },
-      team__pgroll_new_ID_key: {
-        name: "team__pgroll_new_ID_key",
-        columns: ["ID"],
       },
       team__pgroll_new_username_key: {
         name: "team__pgroll_new_username_key",
@@ -373,14 +416,6 @@ const tables = [
       },
     },
     columns: [
-      {
-        name: "ID",
-        type: "int",
-        notNull: true,
-        unique: true,
-        defaultValue: null,
-        comment: "",
-      },
       {
         name: "description",
         type: "text",
@@ -396,6 +431,15 @@ const tables = [
         unique: true,
         defaultValue: null,
         comment: "",
+      },
+      {
+        name: "team_lead",
+        type: "link",
+        link: { table: "Users" },
+        notNull: true,
+        unique: false,
+        defaultValue: null,
+        comment: '{"xata.link":"Users"}',
       },
       {
         name: "xata_createdat",
@@ -464,6 +508,8 @@ const DatabaseClient = buildClient();
 const defaultOptions = {
   databaseURL:
     "https://GICHUKI-KAMAU-s-workspace-fhao0l.us-east-1.xata.sh/db/project1",
+    apiKey: process.env.XATA_API_KEY,
+    branch: process.env.XATA_BRANCH || 'main',
 };
 
 export class XataClient extends DatabaseClient<DatabaseSchema> {
