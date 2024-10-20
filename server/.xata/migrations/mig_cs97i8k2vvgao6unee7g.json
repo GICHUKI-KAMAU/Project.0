@@ -1,0 +1,33 @@
+{
+  "done": true,
+  "migration": {
+    "name": "mig_cs97i8k2vvgao6unee7g",
+    "operations": [
+      {
+        "add_column": {
+          "up": "''",
+          "table": "task",
+          "column": {
+            "pk": false,
+            "name": "project_id",
+            "type": "text",
+            "unique": false,
+            "comment": "{\"xata.link\":\"project\"}",
+            "nullable": false,
+            "references": {
+              "name": "project_id_link",
+              "table": "project",
+              "column": "xata_id",
+              "on_delete": "SET NULL"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "migrationType": "pgroll",
+  "name": "mig_cs97i8k2vvgao6unee7g",
+  "parent": "mig_cs97hsv2qe4a1a2lbnq0",
+  "schema": "public",
+  "startedAt": "2024-10-18T15:05:06.778959Z"
+}
