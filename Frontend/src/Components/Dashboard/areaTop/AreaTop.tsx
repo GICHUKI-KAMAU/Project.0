@@ -1,6 +1,7 @@
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { MdOutlineMenu } from "react-icons/md";
+import { FaUserCircle } from "react-icons/fa";
 import "./AreaTop.scss";
-import { useContext, useEffect, useRef, useState } from "react";
 import { SidebarContext } from "../../../context/SidebarContext";
 import logo from "../../../assets/images/blog-logo.png";
 import "react-date-range/dist/styles.css"; 
@@ -27,8 +28,10 @@ const AreaTop: React.FC = () => {
   const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
   const dateRangeRef = useRef<HTMLDivElement | null>(null);
 
+  const [username, setUsername] = useState<string>("");
+  const [profilePicture, setProfilePicture] = useState<string | null>(null);
 
-  // Add type for MouseEvent and ensure the event.target type is HTMLElement
+  // Handle click outside of the date picker to close it
   const handleClickOutside = (event: MouseEvent) => {
     if (
       dateRangeRef.current &&
@@ -45,7 +48,19 @@ const AreaTop: React.FC = () => {
     };
   }, []);
 
-  // Formatting the selected startDate and endDate for display
+  // Fetch the username from localStorage or any authentication context
+  useEffect(() => {
+    const storedUsername = localStorage.getItem("username");
+    if (storedUsername) {
+      setUsername(storedUsername);
+    }
+    const storedProfilePicture = localStorage.getItem("profilePicture"); // Optional
+    if (storedProfilePicture) {
+      setProfilePicture(storedProfilePicture);
+    }
+  }, []);
+
+  // Formatting the selected startDate for display
   const formattedStartDate = format(state[0].startDate, "MMMM dd, yyyy");
 
   return (
@@ -58,13 +73,11 @@ const AreaTop: React.FC = () => {
         >
           <MdOutlineMenu size={24} />
         </button>
-        <img src={logo} alt='' style={{ width: '70px', height: 'auto' }} />
+        <img src={logo} alt="" style={{ width: "70px", height: "auto" }} />
         <h2 className="area-top-title">HomePage</h2>
       </div>
       <div className="date-display">
-        <p>
-           Date: {formattedStartDate}
-        </p>
+        <p>Date: {formattedStartDate}</p>
       </div>
 
       {showDatePicker && (
@@ -74,11 +87,13 @@ const AreaTop: React.FC = () => {
             onChange={(item: RangeKeyDict) => {
               const selection = item.selection;
               if (selection.startDate && selection.endDate) {
-                setState([{
-                  startDate: selection.startDate,
-                  endDate: selection.endDate,
-                  key: selection.key || "selection"
-                }]);
+                setState([
+                  {
+                    startDate: selection.startDate,
+                    endDate: selection.endDate,
+                    key: selection.key || "selection",
+                  },
+                ]);
               }
             }}
             moveRangeOnFirstSelection={false}
@@ -86,6 +101,19 @@ const AreaTop: React.FC = () => {
           />
         </div>
       )}
+
+      <div className="area-top-right">
+        <p className="welcome-message">Welcome, {username || "Guest"}</p>
+        {profilePicture ? (
+          <img
+            src={profilePicture}
+            alt="Profile"
+            className="profile-picture"
+          />
+        ) : (
+          <FaUserCircle size={40} className="profile-icon" />
+        )}
+      </div>
     </section>
   );
 };

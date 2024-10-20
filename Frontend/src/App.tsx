@@ -9,6 +9,9 @@ import './App.scss'
 import BaseLayout from "./layout/BaseLayout";
 import { Dashboard} from "./screens";
 import { SidebarContext } from "./context/SidebarContext";
+import CreateTeamForm from "./Components/CreateTeam/CreateTeamForm";
+import RegisterForm from "./Components/Authentication/RegisterForm";
+import Login from "./Components/Authentication/Login";
 // import HomePage from "./pages/HomePage";
 
 function App() {
@@ -40,6 +43,9 @@ function App() {
         <Routes>
           <Route element={<BaseLayout />}>
             <Route path='/' element={<Dashboard />} />
+            <Route path='/createTeam' element={<CreateTeamForm />} />
+            <Route path="/register" element={<RegisterForm />} /> 
+            <Route path="/login" element={<Login />} />
         
             {/* <Route index element={<HomePage />} /> */}
           </Route>
