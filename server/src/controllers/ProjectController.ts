@@ -4,12 +4,20 @@ import { getXataClient } from '../xata';
 const xata = getXataClient();
 
 export const createProject = async (req: Request, res: Response): Promise<void> => {
-  const { name, team_ID } = req.body;
+  const { name, team_name } = req.body;
 
   try {
+
+    const team = await xata.db.team.filter({ name: team_name }).getFirst();
+
+    if (!team) {
+      res.status(404).json({ error: 'Team not found' });
+      return;
+    }
+
     const project = await xata.db.project.create({
       name,
-      team_ID,
+      team_ID: team.xata_id,
     });
 
     res.status(201).json(project);
@@ -46,12 +54,20 @@ export const getProjectById = async (req: Request, res: Response): Promise<void>
 
 export const updateProject = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
-  const { name, team_ID } = req.body;
+  const { name, team_name } = req.body;
 
   try {
+
+    const team = await xata.db.team.filter({ name: team_name }).getFirst();
+
+    if (!team) {
+      res.status(404).json({ error: 'Team not found' });
+      return;
+    }
+
     const project = await xata.db.project.update(id, {
       name,
-      team_ID,
+      team_ID: team.xata_id,
     });
 
     if (!project) {

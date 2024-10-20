@@ -3,20 +3,38 @@ import { getXataClient } from '../xata';
 
 const xata = getXataClient();
 
-export const createTask = async (req: Request, res: Response) => {
-  const { description, due_date, AssignedToId, project_id, status } = req.body;
+export const createTask = async (req: Request, res: Response): Promise<void> => {
+  const { description, due_date, AssignedToName, project_name, status } = req.body;
 
   try {
+
+    const user = await xata.db.Users.filter({ username: AssignedToName }).getFirst();
+    if (!user) {
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
+
+    const project = await xata.db.project.filter({ name: project_name }).getFirst();
+    if (!project) {
+      res.status(404).json({ error: 'Project not found' });
+      return;
+    }
+
+    const formattedDueDate = new Date(due_date).toISOString();
+    
+    const booleanStatus = status === 'true' || status === true;
+
     const task = await xata.db.task.create({
       description,
-      due_date,
-      AssignedToId,
-      project_id,
-      status,
+      due_date: formattedDueDate,
+      AssignedToId: user.xata_id,
+      project_id: project.xata_id,
+      status: booleanStatus
     });
 
     res.status(201).json(task);
   } catch (error) {
+    console.error('Error creating task:', error);
     res.status(500).json({ error: 'Error creating task' });
   }
 };
@@ -38,7 +56,7 @@ export const getTaskById = async (req: Request, res: Response): Promise<void> =>
 
     if (!task) {
       res.status(404).json({ message: 'Task not found' });
-      return; // Exit the function to prevent further execution
+      return;
     }
 
     res.status(200).json(task);
@@ -50,16 +68,37 @@ export const getTaskById = async (req: Request, res: Response): Promise<void> =>
 
 export const updateTask = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
-  const { description, due_date, AssignedToId, project_id, status } = req.body;
+  const { description, due_date, AssignedToName, project_name, status } = req.body;
 
   try {
-    const task = await xata.db.task.update(id, {
+
+    const user = await xata.db.Users.filter({ username: AssignedToName }).getFirst();
+    if (!user) {
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
+
+    const project = await xata.db.project.filter({ name: project_name }).getFirst();
+    if (!project) {
+      res.status(404).json({ error: 'Project not found' });
+      return;
+    }
+
+    const formattedDueDate = new Date(due_date).toISOString();
+    
+    const booleanStatus = status !== undefined ? (status === 'true' || status === true) : undefined;
+
+    const updateData: any = {
       description,
-      due_date,
-      AssignedToId,
-      project_id,
-      status,
-    });
+      due_date: formattedDueDate,
+      AssignedToId: user.xata_id,
+      project_id: project.xata_id,
+      status: booleanStatus,
+    };
+
+    Object.keys(updateData).forEach(key => updateData[key] === undefined && delete updateData[key]);
+
+    const task = await xata.db.task.update(id, updateData);
 
     if (!task) {
       res.status(404).json({ message: 'Task not found' });
@@ -68,6 +107,7 @@ export const updateTask = async (req: Request, res: Response): Promise<void> => 
 
     res.status(200).json(task);
   } catch (error) {
+    console.error('Error updating task:', error);
     res.status(500).json({ error: 'Error updating task' });
   }
 };
