@@ -24,7 +24,14 @@ export const AuthController = {
         role: ['user'], // Make sure this matches your schema
       });
 
-      const token = generateToken({ id: newUser.xata_id, role: newUser.role });
+      const token = generateToken({ id: newUser.xata_id, role: newUser.role[0] });
+
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 24 * 60 * 60 * 1000, // 1 day expiration
+      });
+
       res.status(201).json({ token });
     } catch (error) {
       console.error('Error during signup:', error);
@@ -42,12 +49,26 @@ export const AuthController = {
         return;
       }
 
-      const token = generateToken({ id: user.xata_id, role: user.role });
+      const token = generateToken({ id: user.xata_id, role: user.role[0] });
+
+      // Set token as an HTTP-only cookie
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 24 * 60 * 60 * 1000, // 1 day expiration
+      });
+      
       res.status(200).json({ token });
     } catch (error) {
       console.error('Error during login:', error);
       res.status(500).json({ error: 'Server error' });
     }
+  },
+
+  logout: (req: Request, res: Response): void => {
+    // Clear the token cookie
+    res.clearCookie('token');
+    res.status(200).json({ message: 'Logged out successfully' });
   },
 
   getUsers: async (req: Request, res: Response): Promise<void> => {
