@@ -31,6 +31,29 @@ const AreaTop: React.FC = () => {
   const [username, setUsername] = useState<string>("");
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
 
+  // Fetch the logged-in user ID (assumed to be stored in localStorage)
+  useEffect(() => {
+    const userId = localStorage.getItem("userId"); 
+    if (userId) {
+      fetchUserData(userId);
+    }
+  }, []);
+
+  // Function to fetch user data based on the logged-in user ID
+  const fetchUserData = async (userId: string) => {
+    try {
+      const response = await fetch(`http://localhost:3001/users/${userId}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch user data");
+      }
+      const userData = await response.json();
+      setUsername(userData.username || ""); // Set the username from API response
+      setProfilePicture(userData.profilePicture || null); 
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
+
   // Handle click outside of the date picker to close it
   const handleClickOutside = (event: MouseEvent) => {
     if (
@@ -46,18 +69,6 @@ const AreaTop: React.FC = () => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
-
-  // Fetch the username from localStorage or any authentication context
-  useEffect(() => {
-    const storedUsername = localStorage.getItem("username");
-    if (storedUsername) {
-      setUsername(storedUsername);
-    }
-    const storedProfilePicture = localStorage.getItem("profilePicture"); // Optional
-    if (storedProfilePicture) {
-      setProfilePicture(storedProfilePicture);
-    }
   }, []);
 
   // Formatting the selected startDate for display
@@ -103,7 +114,9 @@ const AreaTop: React.FC = () => {
       )}
 
       <div className="area-top-right">
-        <p className="welcome-message">Welcome, {username || "Guest"}</p>
+        <p className="welcome-message">
+          Welcome, {username ? username : "Guest"}
+        </p>
         {profilePicture ? (
           <img
             src={profilePicture}

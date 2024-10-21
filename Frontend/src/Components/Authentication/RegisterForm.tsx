@@ -7,8 +7,8 @@ const RegisterForm: React.FC = () => {
     name: "",
     email: "",
     password: "",
-    confirmPassword: "", // Added confirmPassword field
-    role: "team_member", // Default to "team_member"
+    confirmPassword: "", 
+    role: "team_member", 
   });
 
   const [loading, setLoading] = useState<boolean>(false);
