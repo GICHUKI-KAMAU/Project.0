@@ -36,18 +36,19 @@ export const getProjects = async (req: Request, res: Response): Promise<void> =>
 };
 
 export const getProjectById = async (req: Request, res: Response): Promise<void> => {
-  const { id } = req.params;
+  const { name } = req.params;
 
   try {
-    const project = await xata.db.project.read(id);
+    const projects = await xata.db.project.filter({ name }).getAll(); // Query by name
 
-    if (!project) {
+    if (projects.length === 0) {
       res.status(404).json({ message: 'Project not found' });
       return;
     }
 
-    res.status(200).json(project);
+    res.status(200).json(projects[0]); // Return the first matching project
   } catch (error) {
+    console.error("Error fetching project:", error);
     res.status(500).json({ error: 'Error fetching project' });
   }
 };

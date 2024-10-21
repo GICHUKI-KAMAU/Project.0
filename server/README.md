@@ -187,34 +187,34 @@ pnpm run dev
 Below are the screenshots for each route, demonstrating the requests and responses.
 
 #### Authentication Endpoints
-- **Signup Endpoint**: ![Signup Screenshot](path/to/screenshot_signup.png)
-- **Login Endpoint**: ![Login Screenshot](path/to/screenshot_login.png)
-- **Logout Endpoint**: ![Logout Screenshot](path/to/screenshot_logout.png)
-- **Get Users Endpoint**: ![Get Users Screenshot](path/to/screenshot_get_users.png)
-- **Get User by ID Endpoint**: ![Get User by ID Screenshot](path/to/screenshot_get_user_by_id.png)
+- **Signup Endpoint**: ![Signup Screenshot](./images/signup.png)
+- **Login Endpoint**: ![Login Screenshot](./images/login.png)
+- **Logout Endpoint**: ![Logout Screenshot](./images/logout.png)
+- **Get Users Endpoint**: ![Get Users Screenshot](./images/get-all-users.png)
+- **Get User by ID Endpoint**: ![Get User by ID Screenshot](./images/get-user-by-id.png)
 
 #### Team Management Endpoints
-- **Create Team Endpoint**: ![Create Team Screenshot](path/to/screenshot_create_team.png)
-- **Get Teams Endpoint**: ![Get Teams Screenshot](path/to/screenshot_get_teams.png)
-- **Get Team by ID Endpoint**: ![Get Team by ID Screenshot](path/to/screenshot_get_team_by_id.png)
-- **Update Team Endpoint**: ![Update Team Screenshot](path/to/screenshot_update_team.png)
-- **Delete Team Endpoint**: ![Delete Team Screenshot](path/to/screenshot_delete_team.png)
+- **Create Team Endpoint**: ![Create Team Screenshot](./images/create-a-team.png)
+- **Get Teams Endpoint**: ![Get Teams Screenshot](./images/get-all-teams.png)
+- **Get Team by ID Endpoint**: ![Get Team by ID Screenshot](./images/get-team-by-id.png)
+- **Update Team Endpoint**: ![Update Team Screenshot](./images/update-teams.png)
+- **Delete Team Endpoint**: ![Delete Team Screenshot](./images/delete-team.png)
 
 #### Project Management Endpoints
-- **Create Project Endpoint**: ![Create Project Screenshot](path/to/screenshot_create_project.png)
-- **Get Projects Endpoint**: ![Get Projects Screenshot](path/to/screenshot_get_projects.png)
-- **Get Project by ID Endpoint**: ![Get Project by ID Screenshot](path/to/screenshot_get_project_by_id.png)
+- **Create Project Endpoint**: ![Create Project Screenshot](./images/create-a-project.png)
+- **Get Projects Endpoint**: ![Get Projects Screenshot](./images/get-projects.png)
+- **Get Project by Name Endpoint**: ![Get Project by ID Screenshot](./images/get-project-by-name.png)
 - **Update Project Endpoint**: ![Update Project Screenshot](path/to/screenshot_update_project.png)
 - **Delete Project Endpoint**: ![Delete Project Screenshot](path/to/screenshot_delete_project.png)
 
 #### Task Management Endpoints
-- **Create Task Endpoint**: ![Create Task Screenshot](path/to/screenshot_create_task.png)
-- **Get Tasks Endpoint**: ![Get Tasks Screenshot](path/to/screenshot_get_tasks.png)
-- **Get Task by ID Endpoint**: ![Get Task by ID Screenshot](path/to/screenshot_get_task_by_id.png)
-- **Update Task Endpoint**: ![Update Task Screenshot](path/to/screenshot_update_task.png)
+- **Create Task Endpoint**: ![Create Task Screenshot](./images/create-task.png)
+- **Get Tasks Endpoint**: ![Get Tasks Screenshot](./images/get-all-tasks.png)
+- **Get Task by ID Endpoint**: ![Get Task by ID Screenshot](./images/get-task-by-id.png)
+- **Update Task Endpoint**: ![Update Task Screenshot](./images/update-task.png)
 - **Delete Task Endpoint**: ![Delete Task Screenshot](path/to/screenshot_delete_task.png)
 
 #### Comment Management Endpoints
-- **Add Comment Endpoint**: ![Add Comment Screenshot](path/to/screenshot_add_comment.png)
-- **Get Comments by Task Name Endpoint**: ![Get Comments by Task Name Screenshot](path/to/screenshot_get_comments_by_task_name.png)
+- **Add Comment Endpoint**: ![Add Comment Screenshot](./images/create-a-comment.png)
+- **Get Comments by Task Name Endpoint**: ![Get Comments by Task Name Screenshot](./images/get-comments-based-on-tasks.png)
 
