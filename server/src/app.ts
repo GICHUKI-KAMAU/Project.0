@@ -1,4 +1,5 @@
 import express from 'express';
+import cookieParser from 'cookie-parser'; // Import cookie-parser
 import authRoutes from './routes/authRoutes';
 import teamRoutes from './routes/teamRoutes';
 import projectRoutes from './routes/projectRoutes';
@@ -11,6 +12,7 @@ dotenv.config();
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/teams', teamRoutes);
