@@ -1,4 +1,3 @@
-// controllers/TeamController.ts
 import { Request, Response } from 'express';
 import { getXataClient } from '../xata';
 
@@ -8,6 +7,13 @@ const createTeam = async (req: Request, res: Response): Promise<void> => {
   const { name, description, team_lead } = req.body;
 
   try {
+    const existingTeam = await xata.db.team.filter({ name }).getFirst();
+
+    if (existingTeam) {
+      res.status(400).json({ message: 'A team with this name already exists.' });
+      return;
+    }
+
     const user = await xata.db.Users.filter({ username: team_lead }).getFirst();
     
     if (!user) {
@@ -79,12 +85,30 @@ const updateTeam = async (req: Request, res: Response): Promise<void> => {
 };
 
 const deleteTeam = async (req: Request, res: Response): Promise<void> => {
-  const { id } = req.params;
+  const { name } = req.params;
 
   try {
-    await xata.db.team.delete(id); // Adjust this according to your Xata schema
+    const teams = await xata.db.team.filter({ name }).getAll();
+    
+    if (teams.length === 0) {
+      res.status(404).json({ message: 'Team not found' });
+      return; // Exit if no team matches the name
+    }
+
+    const teamToDelete = teams[0];
+    
+    const associatedProjects = await xata.db.project.filter({ team_ID: teamToDelete.xata_id }).getAll();
+    if (associatedProjects.length > 0) {
+      res.status(400).json({ message: 'Cannot delete team with associated projects' });
+      return;
+    }
+
+    // If no associated projects, delete the team
+    await xata.db.team.delete(teamToDelete.xata_id);
     res.status(204).send(); // No content
+    
   } catch (error) {
+    console.error("Error during deleting a team:", error);
     res.status(500).json({ error: 'Error deleting team' });
   }
 };
