@@ -66,8 +66,8 @@ const AssignTaskForm: React.FC = () => {
       description: taskDescription,
       status,
       dueDate,
-      projectId: selectedProjectId, // Automatically set based on project selection
-      assignedToId, // Automatically set based on email
+      projectId: selectedProjectId, 
+      assignedToId, 
     };
 
     try {

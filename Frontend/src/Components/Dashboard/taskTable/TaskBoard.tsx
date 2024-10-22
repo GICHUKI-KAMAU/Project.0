@@ -36,6 +36,7 @@ const TaskBoard: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [currentTask, setCurrentTask] = useState<Task | null>(null);
   const [taskStatuses, setTaskStatuses] = useState<{ [key: string]: Task['status'] }>({});
+  const [dueDate, setDueDate] = useState<string>(''); // State for due date
   const [projects, setProjects] = useState<Project[]>([]); // State for projects
   const [selectedProjectId, setSelectedProjectId] = useState<string>(''); // State for selected project
   const [assignedToId, setAssignedToId] = useState<string>(''); // State for selected team member
@@ -264,10 +265,10 @@ const TaskBoard: React.FC = () => {
   };
 
   const handleFormSubmit = (event: FormEvent<HTMLFormElement>): void => {
-    event.preventDefault(); // Prevent default form submission
+    event.preventDefault();
     if (currentTask) {
-      handleStatusUpdate(currentTask); // Update the task
-      setIsModalOpen(false); // Close the modal after updating
+      handleStatusUpdate(currentTask);
+      setIsModalOpen(false)
     }
   };
 
@@ -304,7 +305,6 @@ const TaskBoard: React.FC = () => {
         {/* Dropdown for Team Members */}
         <select onChange={handleTeamMemberChange} value={assignedToId}>
           <option value="">All Team Members</option>
-          {/* Add your team members here */}
           <option value="1">Team Member 1</option>
           <option value="2">Team Member 2</option>
           <option value="3">Team Member 3</option>
@@ -328,7 +328,7 @@ const TaskBoard: React.FC = () => {
 
       {/* Modal for updating tasks */}
       {isModalOpen && currentTask && (
-        <Modal onClose={() => setIsModalOpen(false)} isOpen={false}>
+        <Modal onClose={() => setIsModalOpen(false)} isOpen={true}>
           <h2>Update Task</h2>
           <form onSubmit={handleFormSubmit}>
             <label>
@@ -339,6 +339,14 @@ const TaskBoard: React.FC = () => {
                 onChange={(e) => setCurrentTask({ ...currentTask, description: e.target.value })}
               />
             </label>
+            <label htmlFor="dueDate">Due Date</label>
+            <input
+              type="date"
+              id="dueDate"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+              required
+            />
             <button type="submit">Update</button>
           </form>
         </Modal>
