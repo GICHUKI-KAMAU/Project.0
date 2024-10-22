@@ -7,6 +7,7 @@ const loggedInUser = {
   id: "1", // This represents the logged-in user’s ID
   name: "John Doe",
   email: "johndoe@example.com",
+  role: "admin", // User's role (change to "user" to test non-admin access)
 };
 
 interface User {
@@ -84,6 +85,11 @@ const CreateTeamForm: React.FC = () => {
       setLoading(false);
     }
   };
+
+  // Render form if user is admin, otherwise show "Access Denied" message
+  if (loggedInUser.role !== "admin") {
+    return <p>You do not have permission to create a team.</p>;
+  }
 
   return (
     <form onSubmit={handleSubmit} className="create-team-form">
