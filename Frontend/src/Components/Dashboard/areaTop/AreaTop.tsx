@@ -28,8 +28,8 @@ const AreaTop: React.FC = () => {
   const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
   const dateRangeRef = useRef<HTMLDivElement | null>(null);
 
-  const [username, setUsername] = useState<string>("");
-  const [profilePicture, setProfilePicture] = useState<string | null>(null);
+  const [username, setUsername] = useState<string>(""); // Mapping the 'name' field from API
+  const [profilePicture, setProfilePicture] = useState<string | null>(null); // No profile picture in the API
 
   // Fetch the logged-in user ID (assumed to be stored in localStorage)
   useEffect(() => {
@@ -42,13 +42,13 @@ const AreaTop: React.FC = () => {
   // Function to fetch user data based on the logged-in user ID
   const fetchUserData = async (userId: string) => {
     try {
-      const response = await fetch(`http://localhost:3001/users/${userId}`);
+      const response = await fetch(`http://localhost:3000/users/${userId}`);
       if (!response.ok) {
         throw new Error("Failed to fetch user data");
       }
       const userData = await response.json();
-      setUsername(userData.username || ""); // Set the username from API response
-      setProfilePicture(userData.profilePicture || null); 
+      setUsername(userData.name || ""); 
+      
     } catch (error) {
       console.error("Error fetching user data:", error);
     }

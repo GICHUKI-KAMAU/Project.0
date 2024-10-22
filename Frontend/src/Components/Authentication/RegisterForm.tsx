@@ -62,6 +62,8 @@ const RegisterForm: React.FC = () => {
       setSuccessMessage("User registered successfully!");
       setFormData({ name: "", email: "", password: "", confirmPassword: "", role: "team_member" });
 
+      localStorage.setItem("token", data.token);
+      
       setTimeout(() => {
         navigate("/login");
       }, 1000);

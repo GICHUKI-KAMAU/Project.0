@@ -2,9 +2,6 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "./Login.css";
 
-// Importing mock data (replace with actual mock.json import path)
-import mockData from "../MockData/mock.json";
-
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -13,32 +10,45 @@ const Login: React.FC = () => {
 
   const navigate = useNavigate();
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ): void => {
+  // Handle form input changes
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
     if (name === "email") setEmail(value);
     else if (name === "password") setPassword(value);
   };
 
-  const handleSubmit = (e: React.FormEvent): void => {
+  // Handle form submission
+  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
     setErrorMessage(null);
     setSuccessMessage(null);
 
-    // Find the user by email and password (hashed passwords not implemented here)
-    const user = mockData.users.find(
-      (user: { email: string; password: string }) =>
-        user.email === email && user.password === password
-    );
+    try {
+      // Fetch users from the API
+      const response = await fetch("http://localhost:3000/users");
+      if (!response.ok) {
+        throw new Error("Failed to fetch users");
+      }
 
-    if (user) {
-      setSuccessMessage(`Welcome, ${user.name}! You are logged in.`);
-      setTimeout(() => {
-        navigate("/");
-      }, 1000);
-    } else {
-      setErrorMessage("Invalid email or password.");
+      const users = await response.json();
+
+      // Find the user by email and password
+      const user = users.find(
+        (user: { email: string; password: string }) =>
+          user.email === email && user.password === password
+      );
+
+      if (user) {
+        setSuccessMessage(`Welcome, ${user.name}! You are logged in.`);
+        setTimeout(() => {
+          navigate("/");
+        }, 1000);
+      } else {
+        setErrorMessage("Invalid email or password.");
+      }
+    } catch (error) {
+      console.error("Error during login:", error);
+      setErrorMessage("An error occurred. Please try again later.");
     }
   };
 
@@ -76,7 +86,6 @@ const Login: React.FC = () => {
           </Link>
         </p>
       </form>
-
     </div>
   );
 };

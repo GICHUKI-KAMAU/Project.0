@@ -86,8 +86,8 @@
     },
     {
       "id": "1003",
-      "description": "Write project documentation one",
-      "status": "waiting",
+      "description": "Write pro ject documentation one",
+      "status": "in-progress",
       "dueDate": "2024-10-10",
       "projectId": "101",
       "assignedToId": "1"
@@ -110,11 +110,19 @@
     },
     {
       "id": "3d97",
-      "description": "Present work to team board",
+      "description": "Present work to team board again",
       "status": "waiting",
       "dueDate": "2024-12-12",
       "projectId": "101",
       "assignedToId": "e987"
+    },
+    {
+      "id": "f90d",
+      "description": "Present work to team board on Monday",
+      "status": "in-progress",
+      "dueDate": "2024-10-24",
+      "projectId": "101",
+      "assignedToId": "9b02"
     }
   ],
   "comments": [
@@ -134,6 +142,12 @@
       "id": "6208",
       "content": "Working on this atm!",
       "taskId": "1004",
+      "userId": "1"
+    },
+    {
+      "id": "c8bd",
+      "content": "Getting ready",
+      "taskId": "1003",
       "userId": "1"
     }
   ],
