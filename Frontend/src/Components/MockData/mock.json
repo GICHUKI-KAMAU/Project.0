@@ -63,17 +63,19 @@
       "id": "102",
       "name": "Website Redesign",
       "teamId": "1"
+    },
+    {
+      "id": "456d",
+      "name": "UI/UX Design",
+      "teamId": "2"
+    },
+    {
+      "id": "1f70",
+      "name": "Creative design",
+      "teamId": "c33e"
     }
   ],
   "tasks": [
-    {
-      "id": "1001",
-      "description": "Design user interface",
-      "status": "in-progress",
-      "dueDate": "2024-11-01",
-      "projectId": "101",
-      "assignedToId": "2"
-    },
     {
       "id": "1002",
       "description": "Write project documentation",
@@ -84,7 +86,7 @@
     },
     {
       "id": "1003",
-      "description": "Write project documentation",
+      "description": "Write project documentation one",
       "status": "waiting",
       "dueDate": "2024-10-10",
       "projectId": "101",
@@ -95,21 +97,43 @@
       "description": "Design user interface amd progress so that i can finish it.",
       "status": "in-progress",
       "dueDate": "2024-11-01",
-      "projectId": "101",
+      "projectId": "102",
       "assignedToId": "2"
+    },
+    {
+      "id": "565b",
+      "description": "Present work to team manager again",
+      "status": "completed",
+      "dueDate": "2024-10-23",
+      "projectId": "101",
+      "assignedToId": "9b02"
+    },
+    {
+      "id": "3d97",
+      "description": "Present work to team board",
+      "status": "waiting",
+      "dueDate": "2024-12-12",
+      "projectId": "101",
+      "assignedToId": "e987"
     }
   ],
   "comments": [
     {
       "id": "201",
       "content": "We should simplify the design.",
-      "taskId": "1001",
+      "taskId": "1003",
       "userId": "2"
     },
     {
       "id": "202",
       "content": "Documentation complete.",
       "taskId": "1002",
+      "userId": "1"
+    },
+    {
+      "id": "6208",
+      "content": "Working on this atm!",
+      "taskId": "1004",
       "userId": "1"
     }
   ],

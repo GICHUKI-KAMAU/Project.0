@@ -12,6 +12,9 @@ import { SidebarContext } from "./context/SidebarContext";
 import CreateTeamForm from "./Components/CreateTeam/CreateTeamForm";
 import RegisterForm from "./Components/Authentication/RegisterForm";
 import Login from "./Components/Authentication/Login";
+import AddProjectForm from "./Components/AddProject/AddProject";
+import AssignTaskForm from "./Components/AddTask/AssignTask";
+import Notifications from "./Components/Notification/Notification";
 // import HomePage from "./pages/HomePage";
 
 function App() {
@@ -46,6 +49,9 @@ function App() {
             <Route path='/createTeam' element={<CreateTeamForm />} />
             <Route path="/register" element={<RegisterForm />} /> 
             <Route path="/login" element={<Login />} />
+            <Route path="/addproject" element={<AddProjectForm />} />
+            <Route path="/addtask" element={<AssignTaskForm />} />
+            <Route path="/notification" element={<Notifications />} /> 
         
             {/* <Route index element={<HomePage />} /> */}
           </Route>
