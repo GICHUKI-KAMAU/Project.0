@@ -68,6 +68,11 @@
       "id": "456d",
       "name": "UI/UX Design",
       "teamId": "2"
+    },
+    {
+      "id": "1f70",
+      "name": "Creative design",
+      "teamId": "c33e"
     }
   ],
   "tasks": [
@@ -98,7 +103,7 @@
     {
       "id": "565b",
       "description": "Present work to team manager again",
-      "status": "in-progress",
+      "status": "completed",
       "dueDate": "2024-10-23",
       "projectId": "101",
       "assignedToId": "9b02"

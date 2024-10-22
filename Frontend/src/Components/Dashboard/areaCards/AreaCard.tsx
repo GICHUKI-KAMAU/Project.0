@@ -16,15 +16,16 @@ interface AreaCardProps {
   colors: string[];
   percentFillValue: number;
   cardInfo: CardInfo;
+  showChart?: boolean; // New prop to control chart visibility
 }
 
-const AreaCard: React.FC<AreaCardProps> = ({ colors, percentFillValue, cardInfo }) => {
-  const filledValue = (percentFillValue / 100) * 360; // 360 degress for a full circle
+const AreaCard: React.FC<AreaCardProps> = ({ colors, percentFillValue, cardInfo, showChart = true }) => {
+  const filledValue = (percentFillValue / 100) * 360; // 360 degrees for a full circle
   const remainedValue = 360 - filledValue;
 
   const data = [
-    { name: "Remaining tasks", value: remainedValue },
-    { name: "Completed Tasks", value: filledValue },
+    { name: "Completed tasks", value: remainedValue },
+    { name: "Pending Tasks", value: filledValue },
   ];
 
   const renderTooltipContent = (value: number) => {
@@ -38,30 +39,32 @@ const AreaCard: React.FC<AreaCardProps> = ({ colors, percentFillValue, cardInfo 
         <div className="info-value">{cardInfo.value}</div>
         <p className="info-text">{cardInfo.text}</p>
       </div>
-      <div className="area-card-chart">
-        <PieChart width={100} height={100}>
-          <Pie
-            data={data}
-            cx={50}
-            cy={45}
-            innerRadius={20}
-            fill="#e4e8ef"
-            paddingAngle={0}
-            dataKey="value"
-            startAngle={-270}
-            endAngle={150}
-            stroke="none"
-          >
-            {data.map((entry, index) => (
-              <Cell
-                key={`cell-${index}`}
-                fill={colors[index % colors.length]}
-              />
-            ))}
-          </Pie>
-          <Tooltip formatter={renderTooltipContent} />
-        </PieChart>
-      </div>
+      {showChart && ( // Conditional rendering of the chart
+        <div className="area-card-chart">
+          <PieChart width={100} height={100}>
+            <Pie
+              data={data}
+              cx={50}
+              cy={45}
+              innerRadius={20}
+              fill="#e4e8ef"
+              paddingAngle={0}
+              dataKey="value"
+              startAngle={-270}
+              endAngle={150}
+              stroke="none"
+            >
+              {data.map((entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={colors[index % colors.length]}
+                />
+              ))}
+            </Pie>
+            <Tooltip formatter={renderTooltipContent} />
+          </PieChart>
+        </div>
+      )}
     </div>
   );
 };
@@ -76,4 +79,5 @@ AreaCard.propTypes = {
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     text: PropTypes.string.isRequired,
   }).isRequired,
+  showChart: PropTypes.bool, // Prop type for showChart
 };

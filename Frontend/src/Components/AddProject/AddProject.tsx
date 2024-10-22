@@ -1,10 +1,30 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./AddProject.css";
 
 const AddProjectForm: React.FC = () => {
   // State to hold the form input values
   const [projectName, setProjectName] = useState<string>("");
   const [teamId, setTeamId] = useState<string>("");
+  const [teams, setTeams] = useState<{ id: string; name: string }[]>([]); // State for teams
+
+  // Fetch teams from the API when the component mounts
+  useEffect(() => {
+    const fetchTeams = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/teams");
+        if (response.ok) {
+          const data = await response.json();
+          setTeams(data); // Set the teams state with the fetched data
+        } else {
+          console.error("Failed to fetch teams");
+        }
+      } catch (error) {
+        console.error("Error fetching teams:", error);
+      }
+    };
+
+    fetchTeams();
+  }, []); // Empty dependency array to run only once
 
   // Function to handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -55,14 +75,20 @@ const AddProjectForm: React.FC = () => {
           />
         </div>
         <div>
-          <label htmlFor="teamId">Team ID:</label>
-          <input
-            type="text"
+          <label htmlFor="teamId">Select Team:</label>
+          <select
             id="teamId"
             value={teamId}
             onChange={(e) => setTeamId(e.target.value)}
             required
-          />
+          >
+            <option value="">Select a team</option>
+            {teams.map((team) => (
+              <option key={team.id} value={team.id}>
+                {team.name}
+              </option>
+            ))}
+          </select>
         </div>
         <button type="submit">Add Project</button>
       </form>
