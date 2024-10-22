@@ -1,14 +1,15 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "description": "",
+  "description": "This is the **backend** of the Task Management Application built with **Node.js**, **Express**, **TypeScript**, and **Xata** as the database. The backend provides a RESTful API that enables user authentication, team/project/task management, and commenting. Authentication is handled with both **JWT tokens** and **session-based authentication** using cookies.",
   "main": "index.js",
   "scripts": {
     "build": "npx tsc",
     "start": "npx tsc && node dist/server.js",
     "dev:node": "npx ts-node src/server.ts",
     "dev": "nodemon --watch src --exec ts-node src/server.ts",
-    "check": "tsc --noEmit"
+    "check": "tsc --noEmit",
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
@@ -35,10 +36,14 @@
     "@types/cookie-parser": "^1.4.7",
     "@types/express": "^5.0.0",
     "@types/express-validator": "^3.0.0",
+    "@types/jest": "^29.5.13",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/node": "^22.7.5",
     "@types/nodemailer": "^6.4.16",
+    "i": "^0.3.7",
+    "jest": "^29.7.0",
     "nodemon": "^3.1.7",
+    "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.2"
   }
