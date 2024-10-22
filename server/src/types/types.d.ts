@@ -1,5 +1,5 @@
-// src/types.d.ts
 import { Request } from 'express';
+import { UserRecord } from '../types/UserRecord';
 
 declare global {
   namespace Express {
