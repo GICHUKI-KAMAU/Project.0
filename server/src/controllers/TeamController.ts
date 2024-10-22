@@ -4,7 +4,7 @@ import { getXataClient } from '../xata';
 const xata = getXataClient();
 
 const createTeam = async (req: Request, res: Response): Promise<void> => {
-  const { name, description, team_lead } = req.body;
+  const { name, description, team_lead, members } = req.body;
 
   try {
     const existingTeam = await xata.db.team.filter({ name }).getFirst();
@@ -14,17 +14,34 @@ const createTeam = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const user = await xata.db.Users.filter({ username: team_lead }).getFirst();
+    // Fetch the team lead user
+    const teamLeadUser = await xata.db.Users.filter({ username: team_lead }).getFirst();
     
-    if (!user) {
+    if (!teamLeadUser) {
       res.status(404).json({ message: 'Team lead not found' });
       return
+    }
+
+    // Fetch the members
+    const memberRecords = [];
+
+    for (const member of members) {
+
+      const memberRecord = await xata.db.Users.filter({ username: member }).getFirst();
+      
+      if (!memberRecord) {
+        res.status(404).json({ message: `User ${member} not found` });
+        return;
+      }
+
+      memberRecords.push(memberRecord.xata_id);  // Add member IDs
     }
 
     const team = await xata.db.team.create({
       name,
       description,
-      team_lead: user.xata_id,
+      team_lead: teamLeadUser.xata_id,
+      members: memberRecords
     });
 
     res.status(201).json(team);
@@ -37,7 +54,22 @@ const createTeam = async (req: Request, res: Response): Promise<void> => {
 const getTeams = async (req: Request, res: Response): Promise<void> => {
   try {
     const teams = await xata.db.team.getAll();
-    res.status(200).json(teams);
+
+    const formattedTeams = await Promise.all(
+      teams.map(async (team) => {
+        const teamLead = await xata.db.Users.read(team.team_lead);
+        return {
+          ...team,
+          team_lead_name: teamLead?.username, // Add team lead username
+          members: await Promise.all((team.members ?? []).map(async (memberId) => { // Use nullish coalescing
+            const member = await xata.db.Users.read(memberId);
+            return member?.username; // Add member usernames
+          })),
+        };
+      })
+    );
+
+    res.status(200).json(formattedTeams);
   } catch (error) {
     res.status(500).json({ error: 'Error fetching teams' });
   }
@@ -45,7 +77,7 @@ const getTeams = async (req: Request, res: Response): Promise<void> => {
 
 const getTeamById = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
-  
+
   try {
     const team = await xata.db.team.read(id);
 
@@ -54,7 +86,18 @@ const getTeamById = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    res.status(200).json(team);
+    // Fetch team lead and members
+    const teamLead = await xata.db.Users.read(team.team_lead);
+    const members = await Promise.all((team.members ?? []).map(async (memberId) => { // Use nullish coalescing
+      const member = await xata.db.Users.read(memberId);
+      return member?.username; // Add member usernames
+    }));
+
+    res.status(200).json({
+      ...team,
+      team_lead_name: teamLead?.username, // Add team lead username
+      members, // Add members
+    });
   } catch (error) {
     res.status(500).json({ error: 'Error fetching team' });
   }
@@ -62,20 +105,31 @@ const getTeamById = async (req: Request, res: Response): Promise<void> => {
 
 const updateTeam = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
-  const { name, description, team_lead } = req.body;
-
-  const user = await xata.db.Users.filter({ username: team_lead }).getFirst();
-    
-    if (!user) {
-      res.status(404).json({ message: 'Team lead not found' });
-      return
-    }
+  const { name, description, team_lead, members } = req.body;
 
   try {
+    const teamLeadUser = await xata.db.Users.filter({ username: team_lead }).getFirst();
+    if (!teamLeadUser) {
+      res.status(404).json({ message: 'Team lead not found' });
+      return;
+    }
+
+    // Fetch and validate members
+    const memberRecords = [];
+    for (const member of members) {
+      const memberRecord = await xata.db.Users.filter({ username: member }).getFirst();
+      if (!memberRecord) {
+        res.status(404).json({ message: `User ${member} not found` });
+        return;
+      }
+      memberRecords.push(memberRecord.xata_id); // Add member IDs
+    }
+
     const team = await xata.db.team.update(id, {
       name,
       description,
-      team_lead: user.xata_id,
+      team_lead: teamLeadUser.xata_id,
+      members: memberRecords, // Update members
     });
 
     res.status(200).json(team);
@@ -85,18 +139,16 @@ const updateTeam = async (req: Request, res: Response): Promise<void> => {
 };
 
 const deleteTeam = async (req: Request, res: Response): Promise<void> => {
-  const { name } = req.params;
+  const { id } = req.params; // Changed to use ID instead of name
 
   try {
-    const teams = await xata.db.team.filter({ name }).getAll();
+    const teamToDelete = await xata.db.team.read(id);
     
-    if (teams.length === 0) {
+    if (!teamToDelete) {
       res.status(404).json({ message: 'Team not found' });
-      return; // Exit if no team matches the name
+      return;
     }
 
-    const teamToDelete = teams[0];
-    
     const associatedProjects = await xata.db.project.filter({ team_ID: teamToDelete.xata_id }).getAll();
     if (associatedProjects.length > 0) {
       res.status(400).json({ message: 'Cannot delete team with associated projects' });

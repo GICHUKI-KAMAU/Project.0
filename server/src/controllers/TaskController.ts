@@ -1,12 +1,29 @@
 import { Request, Response } from 'express';
 import { getXataClient } from '../xata';
+import { JwtPayload } from 'jsonwebtoken';
+import { verifyToken } from '../utils/jwtUtils'; // Ensure this function exists and properly verifies the JWT token
 
 const xata = getXataClient();
 
 export const createTask = async (req: Request, res: Response): Promise<void> => {
-  const { description, due_date, AssignedToName, project_name, status } = req.body;
+  const { description, due_date, AssignedToName, project_name, status = 'waiting' } = req.body;
 
   try {
+    const token = req.cookies.token;
+
+    if (!token) {
+      res.status(401).json({ message: 'Authentication token is missing' });
+      return;
+    }
+
+    // Verify the token and extract user info
+    const payload = verifyToken(token) as JwtPayload;
+    const requestingUser = await xata.db.Users.read(payload.id); // Get the user from the token payload
+
+    if (!requestingUser) { // Check if requestingUser is null
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
 
     const user = await xata.db.Users.filter({ username: AssignedToName }).getFirst();
     if (!user) {
@@ -20,16 +37,23 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
       return;
     }
 
+    const team = await xata.db.team.read(project.team_ID);
+    if (!team || team.team_lead.xata_id !== requestingUser.xata_id) { // Access xata_id correctly
+      res.status(403).json({ error: 'Forbidden: Only the team lead can create tasks' });
+      return;
+    }
+
     const formattedDueDate = new Date(due_date).toISOString();
     
-    const booleanStatus = status === 'true' || status === true;
+    const validStatuses = ['waiting', 'in progress', 'completed']; // status
+    const taskStatus = validStatuses.includes(status) ? status : 'waiting';
 
     const task = await xata.db.task.create({
       description,
       due_date: formattedDueDate,
       AssignedToId: user.xata_id,
       project_id: project.xata_id,
-      status: booleanStatus
+      status: [taskStatus]
     });
 
     res.status(201).json(task);
@@ -48,7 +72,7 @@ export const getTasks = async (req: Request, res: Response) => {
   }
 };
 
-export const getTaskById = async (req: Request, res: Response): Promise<void> => {
+export const getTaskById = async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
@@ -65,12 +89,26 @@ export const getTaskById = async (req: Request, res: Response): Promise<void> =>
   }
 };
 
-
 export const updateTask = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
   const { description, due_date, AssignedToName, project_name, status } = req.body;
 
   try {
+    const token = req.cookies.token;
+
+    if (!token) {
+      res.status(401).json({ message: 'Authentication token is missing' });
+      return;
+    }
+
+    // Verify the token and extract user info
+    const payload = verifyToken(token) as JwtPayload;
+    const requestingUser = await xata.db.Users.read(payload.id); // Get the user from the token payload
+
+    if (!requestingUser) { // Check if requestingUser is null
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
 
     const user = await xata.db.Users.filter({ username: AssignedToName }).getFirst();
     if (!user) {
@@ -84,16 +122,23 @@ export const updateTask = async (req: Request, res: Response): Promise<void> => 
       return;
     }
 
+    const team = await xata.db.team.read(project.team_ID);
+    if (!team || team.team_lead.xata_id !== requestingUser.xata_id) {
+      res.status(403).json({ error: 'Forbidden: Only the team lead can update tasks' });
+      return;
+    }
+
     const formattedDueDate = new Date(due_date).toISOString();
-    
-    const booleanStatus = status !== undefined ? (status === 'true' || status === true) : undefined;
+
+    const validStatuses = ['waiting', 'in-progress', 'completed'];
+    const taskStatus = status && validStatuses.includes(status) ? status : 'waiting';
 
     const updateData: any = {
       description,
       due_date: formattedDueDate,
       AssignedToId: user.xata_id,
       project_id: project.xata_id,
-      status: booleanStatus,
+      status: [taskStatus],
     };
 
     Object.keys(updateData).forEach(key => updateData[key] === undefined && delete updateData[key]);
@@ -111,7 +156,6 @@ export const updateTask = async (req: Request, res: Response): Promise<void> => 
     res.status(500).json({ error: 'Error updating task' });
   }
 };
-
 
 export const deleteTask = async (req: Request, res: Response) => {
   const { id } = req.params;

@@ -1,0 +1,26 @@
+{
+  "done": true,
+  "migration": {
+    "name": "mig_csblpdv2qe4a1a2lch60",
+    "operations": [
+      {
+        "add_column": {
+          "table": "team",
+          "column": {
+            "pk": false,
+            "name": "members",
+            "type": "text[]",
+            "unique": false,
+            "comment": "",
+            "nullable": true
+          }
+        }
+      }
+    ]
+  },
+  "migrationType": "pgroll",
+  "name": "mig_csblpdv2qe4a1a2lch60",
+  "parent": "mig_csbkkg72qe4a1a2lcgtg",
+  "schema": "public",
+  "startedAt": "2024-10-22T08:05:12.368479Z"
+}
