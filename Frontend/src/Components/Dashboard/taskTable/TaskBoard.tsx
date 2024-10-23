@@ -1,6 +1,6 @@
 import React, { useState, useEffect, FormEvent } from 'react';
 import './TaskBoard.css';
-import Modal from './Modal'; // Import the Modal component
+import Modal from './Modal';
 
 interface Task {
   id: string;

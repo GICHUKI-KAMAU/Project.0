@@ -6,8 +6,8 @@ import "./AreaCards.scss";
 const AreaCards = () => {
   const [totalProjects, setTotalProjects] = useState(0);
   const [pendingTasks, setPendingTasks] = useState(0);
-  const [totalTasks, setTotalTasks] = useState(0); // State for total tasks
-  const [completedTasks, setCompletedTasks] = useState(0); // State for completed tasks
+  const [totalTasks, setTotalTasks] = useState(0);
+  const [completedTasks, setCompletedTasks] = useState(0); 
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -30,8 +30,8 @@ const AreaCards = () => {
 
         const countPendingTasks = inProgressTasks + waitingTasks;
         setPendingTasks(countPendingTasks);
-        setTotalTasks(tasks.length); // Update total tasks
-        setCompletedTasks(completedTaskCount); // Update completed tasks
+        setTotalTasks(tasks.length); 
+        setCompletedTasks(completedTaskCount);
       } catch (error) {
         console.error("Error fetching tasks:", error);
       }
@@ -58,7 +58,7 @@ const AreaCards = () => {
       />
       <AreaCard
         colors={["#e4e8ef", "#4ce13f"]}
-        percentFillValue={percentFillValue} // Use calculated percentage for pending tasks
+        percentFillValue={percentFillValue} 
         cardInfo={{
           title: "Pending Tasks",
           value: pendingTasks.toString(), 
@@ -67,10 +67,10 @@ const AreaCards = () => {
       />
       <AreaCard
         colors={["#e4e8ef", "#f29a2e"]}
-        percentFillValue={(completedTasks / totalTasks) * 100} // Calculate percentage of completed tasks
+        percentFillValue={(completedTasks / totalTasks) * 100} 
         cardInfo={{
           title: "Completed Tasks",
-          value: completedTasks.toString(), // Use completed tasks count
+          value: completedTasks.toString(), 
           text: "All completed Tasks",
         }}
         showChart={false}

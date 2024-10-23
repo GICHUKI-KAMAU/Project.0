@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext"; 
 import "./Login.css";
 
 const Login: React.FC = () => {
@@ -9,6 +10,7 @@ const Login: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const navigate = useNavigate();
+  const { login } = useAuth(); 
 
   // Handle form input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
@@ -32,7 +34,7 @@ const Login: React.FC = () => {
 
       const users = await response.json();
 
-      // Find the user by email and password
+      // Find the user by email and password (ideally, you should hash the password)
       const user = users.find(
         (user: { email: string; password: string }) =>
           user.email === email && user.password === password
@@ -40,9 +42,15 @@ const Login: React.FC = () => {
 
       if (user) {
         setSuccessMessage(`Welcome, ${user.name}! You are logged in.`);
-        setTimeout(() => {
-          navigate("/");
-        }, 1000);
+
+        // Store the logged-in user's email in localStorage
+        localStorage.setItem("loggedInEmail", user.email);
+
+        // Call the login function from AuthContext to update auth state
+        login(user);
+
+        // Redirect to the home page immediately after a successful login
+        navigate("/");
       } else {
         setErrorMessage("Invalid email or password.");
       }
