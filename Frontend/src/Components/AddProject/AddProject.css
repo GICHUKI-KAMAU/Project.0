@@ -5,6 +5,7 @@
     border: 1px solid #ddd;
     border-radius: 5px;
     background-color: #f9f9f9;
+    align-items: center;
   }
 
 h2 {
@@ -19,7 +20,6 @@ form {
     gap: 15px;
 }
 
-/* Label styling */
 label {
     font-size: 14px;
     font-weight: 600;

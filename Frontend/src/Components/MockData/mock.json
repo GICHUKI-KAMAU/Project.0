@@ -27,6 +27,16 @@
       "email": "adrian@yahoo.com",
       "password": "adrian",
       "role": "team_member"
+    },
+    {
+      "id": "9f9f",
+      "email": "john@example.com",
+      "password": "try"
+    },
+    {
+      "id": "8921",
+      "email": "john@example.com",
+      "password": "try"
     }
   ],
   "teams": [
@@ -123,6 +133,14 @@
       "dueDate": "2024-10-24",
       "projectId": "101",
       "assignedToId": "9b02"
+    },
+    {
+      "id": "4d3d",
+      "description": "Update work",
+      "status": "waiting",
+      "dueDate": "2024-10-23",
+      "projectId": "102",
+      "assignedToId": "e987"
     }
   ],
   "comments": [
@@ -153,10 +171,8 @@
   ],
   "notifications": [
     {
-      "id": "3001",
-      "userId": "1",
-      "message": "Task deadline for 'Design user interface' is approaching.",
-      "isRead": false
+      "isRead": true,
+      "id": "3001"
     },
     {
       "id": "3002",

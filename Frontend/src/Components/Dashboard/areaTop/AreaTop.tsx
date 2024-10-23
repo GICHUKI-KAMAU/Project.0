@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { MdOutlineMenu } from "react-icons/md";
-import { FaUserCircle } from "react-icons/fa";
 import "./AreaTop.scss";
 import { SidebarContext } from "../../../context/SidebarContext";
 import logo from "../../../assets/images/blog-logo.png";
@@ -28,29 +27,41 @@ const AreaTop: React.FC = () => {
   const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
   const dateRangeRef = useRef<HTMLDivElement | null>(null);
 
-  const [username, setUsername] = useState<string>(""); // Mapping the 'name' field from API
-  const [profilePicture, setProfilePicture] = useState<string | null>(null); // No profile picture in the API
+  const [username, setUsername] = useState<string>("Guest"); // Default to "Guest" if not logged in
+  const [loggedInEmail, setLoggedInEmail] = useState<string | null>(null); // The email of the logged-in user
 
-  // Fetch the logged-in user ID (assumed to be stored in localStorage)
+  // Assume the logged-in email is passed from the login process
   useEffect(() => {
-    const userId = localStorage.getItem("userId"); 
-    if (userId) {
-      fetchUserData(userId);
-    }
+    const email = localStorage.getItem("loggedInEmail"); 
+    setLoggedInEmail(email);
   }, []);
 
-  // Function to fetch user data based on the logged-in user ID
-  const fetchUserData = async (userId: string) => {
+  useEffect(() => {
+    if (loggedInEmail) {
+      fetchUsersData();
+    }
+  }, [loggedInEmail]);
+
+  // Function to fetch all users data
+  const fetchUsersData = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/users/${userId}`);
+      const response = await fetch("http://localhost:3000/users");
       if (!response.ok) {
-        throw new Error("Failed to fetch user data");
+        throw new Error("Failed to fetch users");
       }
-      const userData = await response.json();
-      setUsername(userData.name || ""); 
-      
+      const users = await response.json();
+
+      // Find the user by their logged-in email
+      const loggedInUser = users.find((user: { email: string }) => user.email === loggedInEmail);
+
+      if (loggedInUser) {
+        setUsername(loggedInUser.name);  // Set the name of the logged-in user
+      } else {
+        setUsername("Guest");  // If no user is found, set to "Guest"
+      }
     } catch (error) {
-      console.error("Error fetching user data:", error);
+      console.error("Error fetching users:", error);
+      setUsername("Guest");  // Handle error by showing "Guest"
     }
   };
 
@@ -115,17 +126,8 @@ const AreaTop: React.FC = () => {
 
       <div className="area-top-right">
         <p className="welcome-message">
-          Welcome, {username ? username : "Guest"}
+          Welcome, {username}
         </p>
-        {profilePicture ? (
-          <img
-            src={profilePicture}
-            alt="Profile"
-            className="profile-picture"
-          />
-        ) : (
-          <FaUserCircle size={40} className="profile-icon" />
-        )}
       </div>
     </section>
   );
