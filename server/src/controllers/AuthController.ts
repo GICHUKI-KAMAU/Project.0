@@ -9,6 +9,7 @@ export const AuthController = {
   signup: async (req: Request, res: Response): Promise<void> => {
     try {
       const { email, password, username } = req.body;
+
       const existingUser = await xata.db.Users.filter({ email }).getFirst();
 
       if (existingUser) {
@@ -16,12 +17,20 @@ export const AuthController = {
         return;
       }
 
+      const existingUsername = await xata.db.Users.filter({ username }).getFirst();
+
+      if (existingUsername) {
+        res.status(400).json({ message: 'Username already taken' });
+        return;
+      }
+
       const hashedPassword = await hashPassword(password);
+
       const newUser = await xata.db.Users.create({
         email,
         password: hashedPassword,
         username,
-        role: ['user'], // Make sure this matches your schema
+        role: ['user'],
       });
 
       const token = generateToken({ id: newUser.xata_id, role: newUser.role[0] });
@@ -29,10 +38,11 @@ export const AuthController = {
       res.cookie('token', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        maxAge: 24 * 60 * 60 * 1000, // 1 day expiration
+        maxAge: 24 * 60 * 60 * 1000,
       });
 
       res.status(201).json({ token });
+
     } catch (error) {
       console.error('Error during signup:', error);
       res.status(500).json({ error: 'Server error' });
@@ -49,7 +59,14 @@ export const AuthController = {
         return;
       }
 
-      const token = generateToken({ id: user.xata_id, role: user.role[0] });
+      const teamLeadRecord = await xata.db.team.filter({ 'team_lead.xata_id': user.xata_id }).getFirst();
+      const isTeamLead = !!teamLeadRecord;
+
+      const token = generateToken({
+        id: user.xata_id,
+        role: user.role[0],
+        team_lead: isTeamLead,
+      });
 
       // Set token as an HTTP-only cookie
       res.cookie('token', token, {
@@ -57,7 +74,7 @@ export const AuthController = {
         secure: process.env.NODE_ENV === 'production',
         maxAge: 24 * 60 * 60 * 1000, // 1 day expiration
       });
-      
+
       res.status(200).json({ token });
     } catch (error) {
       console.error('Error during login:', error);

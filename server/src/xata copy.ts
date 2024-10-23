@@ -424,14 +424,6 @@ const tables = [
         comment: "",
       },
       {
-        name: "members",
-        type: "multiple",
-        notNull: false,
-        unique: false,
-        defaultValue: null,
-        comment: "",
-      },
-      {
         name: "name",
         type: "text",
         notNull: true,
