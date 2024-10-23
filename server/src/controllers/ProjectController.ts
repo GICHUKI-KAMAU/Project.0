@@ -78,6 +78,7 @@ export const updateProject = async (req: Request, res: Response): Promise<void> 
 
     res.status(200).json(project);
   } catch (error) {
+    console.error('Error updating project:', error);
     res.status(500).json({ error: 'Error updating project' });
   }
 };

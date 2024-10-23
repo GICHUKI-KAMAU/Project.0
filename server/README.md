@@ -204,7 +204,7 @@ Below are the screenshots for each route, demonstrating the requests and respons
 - **Create Project Endpoint**: ![Create Project Screenshot](./images/create-a-project.png)
 - **Get Projects Endpoint**: ![Get Projects Screenshot](./images/get-projects.png)
 - **Get Project by Name Endpoint**: ![Get Project by ID Screenshot](./images/get-project-by-name.png)
-- **Update Project Endpoint**: ![Update Project Screenshot](path/to/screenshot_update_project.png)
+- **Update Project Endpoint**: ![Update Project Screenshot](./images/update-project.png)
 - **Delete Project Endpoint**: ![Delete Project Screenshot](path/to/screenshot_delete_project.png)
 
 #### Task Management Endpoints
