@@ -1,4 +1,5 @@
 import React, { useState, useEffect, FormEvent } from 'react';
+import { getTasks } from '../../../Utils/api';
 import './TaskBoard.css';
 import Modal from './Modal';
 
@@ -45,7 +46,7 @@ const TaskBoard: React.FC = () => {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const response = await fetch('http://localhost:3000/tasks');
+        const response = await fetch('http://localhost:3000');
         if (!response.ok) {
           throw new Error('Failed to fetch tasks');
         }
@@ -56,6 +57,7 @@ const TaskBoard: React.FC = () => {
           throw new Error('Tasks data is not an array');
         }
       } catch (err) {
+        console.log("err:", err)
         setError((err as Error).message);
       } finally {
         setLoading(false);
@@ -67,7 +69,7 @@ const TaskBoard: React.FC = () => {
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const response = await fetch('http://localhost:3000/comments');
+        const response = await fetch('http://localhost:3000');
         if (!response.ok) {
           throw new Error('Failed to fetch comments');
         }
@@ -87,7 +89,7 @@ const TaskBoard: React.FC = () => {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await fetch('http://localhost:3000/projects');
+        const response = await fetch('http://localhost:3000');
         if (!response.ok) {
           throw new Error('Failed to fetch projects');
         }
@@ -124,7 +126,7 @@ const TaskBoard: React.FC = () => {
 
   const handleAddComment = async (taskId: string, content: string) => {
     try {
-      const response = await fetch('http://localhost:3000/comments', {
+      const response = await fetch('http://localhost:3000', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -149,7 +151,7 @@ const TaskBoard: React.FC = () => {
     if (!confirmDelete) return;
 
     try {
-      const response = await fetch(`http://localhost:3000/tasks/${taskId}`, {
+      const response = await fetch(`http://localhost:3000`, {
         method: 'DELETE',
       });
 
@@ -173,7 +175,7 @@ const TaskBoard: React.FC = () => {
   const handleStatusUpdate = async (task: Task) => {
     try {
       const updatedStatus = taskStatuses[task.id] || task.status;
-      const response = await fetch(`http://localhost:3000/tasks/${task.id}`, {
+      const response = await fetch(`http://localhost:3000`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

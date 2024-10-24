@@ -27,8 +27,8 @@ const AreaTop: React.FC = () => {
   const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
   const dateRangeRef = useRef<HTMLDivElement | null>(null);
 
-  const [username, setUsername] = useState<string>("Guest"); // Default to "Guest" if not logged in
-  const [loggedInEmail, setLoggedInEmail] = useState<string | null>(null); // The email of the logged-in user
+  const [username, setUsername] = useState<string>("Guest"); 
+  const [loggedInEmail, setLoggedInEmail] = useState<string | null>(null); 
 
   // Assume the logged-in email is passed from the login process
   useEffect(() => {
@@ -42,26 +42,28 @@ const AreaTop: React.FC = () => {
     }
   }, [loggedInEmail]);
 
-  // Function to fetch all users data
   const fetchUsersData = async () => {
     try {
-      const response = await fetch("http://localhost:3000/users");
+      const response = await fetch("http://localhost:3500/api/auth/users", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      });
       if (!response.ok) {
         throw new Error("Failed to fetch users");
       }
       const users = await response.json();
 
-      // Find the user by their logged-in email
+
       const loggedInUser = users.find((user: { email: string }) => user.email === loggedInEmail);
 
       if (loggedInUser) {
-        setUsername(loggedInUser.name);  // Set the name of the logged-in user
+        setUsername(loggedInUser.name); 
       } else {
-        setUsername("Guest");  // If no user is found, set to "Guest"
-      }
+        setUsername("Guest");        }
     } catch (error) {
       console.error("Error fetching users:", error);
-      setUsername("Guest");  // Handle error by showing "Guest"
+      setUsername("Guest");  
     }
   };
 

@@ -28,7 +28,7 @@ interface User {
 }
 
 const CreateTeamForm: React.FC = () => {
-  const { user } = useAuth(); // Get logged-in user from AuthContext
+  const { user } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [teamName, setTeamName] = useState("");
   const [description, setDescription] = useState("");
@@ -47,7 +47,7 @@ const CreateTeamForm: React.FC = () => {
       try {
         const response = await fetch("http://localhost:3000/users");
         if (!response.ok) {
-          throw new Error("Failed to fetch users.");
+          // throw new Error("Failed to fetch users.");
         }
         const data: User[] = await response.json();
         setUsers(data);

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext"; 
+import { login as apiLogin } from "../../Utils/api"; 
 import "./Login.css";
 
 const Login: React.FC = () => {
@@ -10,7 +10,6 @@ const Login: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const navigate = useNavigate();
-  const { login } = useAuth(); 
 
   // Handle form input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
@@ -19,44 +18,36 @@ const Login: React.FC = () => {
     else if (name === "password") setPassword(value);
   };
 
-  // Handle form submission
   const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
     setErrorMessage(null);
     setSuccessMessage(null);
 
     try {
-      // Fetch users from the API
-      const response = await fetch("http://localhost:3000/users");
-      if (!response.ok) {
-        throw new Error("Failed to fetch users");
-      }
+      const userData = { username: "", email, password };
+      
 
-      const users = await response.json();
+      const response = await apiLogin(userData) as {
+        status: number; data: { user: { username: string }, token: string } 
+};
 
-      // Find the user by email and password (ideally, you should hash the password)
-      const user = users.find(
-        (user: { email: string; password: string }) =>
-          user.email === email && user.password === password
-      );
+      if (response.status === 200) {
+        const data: { user: { username: string }, token: string } = response.data;
 
-      if (user) {
-        setSuccessMessage(`Welcome, ${user.name}! You are logged in.`);
+        localStorage.setItem("authToken", data.token);
+        // setSuccessMessage(`Welcome, ${data.user.username}! You are logged in.`);
 
-        // Store the logged-in user's email in localStorage
-        localStorage.setItem("loggedInEmail", user.email);
-
-        // Call the login function from AuthContext to update auth state
-        login(user);
-
-        // Redirect to the home page immediately after a successful login
         navigate("/");
       } else {
         setErrorMessage("Invalid email or password.");
       }
-    } catch (error) {
-      console.error("Error during login:", error);
-      setErrorMessage("An error occurred. Please try again later.");
+    } catch (error: any) {
+      console.error(error);
+      if (error.response && error.response.status === 401) {
+        setErrorMessage("Invalid email or password.");
+      } else {
+        setErrorMessage("An error occurred. Please try again later.");
+      }
     }
   };
 
