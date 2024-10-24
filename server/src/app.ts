@@ -1,5 +1,6 @@
 import express from 'express';
-import cookieParser from 'cookie-parser'; // Import cookie-parser
+import cors from 'cors';
+import cookieParser from 'cookie-parser'; 
 import authRoutes from './routes/authRoutes';
 import teamRoutes from './routes/teamRoutes';
 import projectRoutes from './routes/projectRoutes';
@@ -10,6 +11,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const app = express();
+app.use(cors());
 
 app.use(express.json());
 app.use(cookieParser());

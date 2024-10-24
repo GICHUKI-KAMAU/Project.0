@@ -6,10 +6,12 @@ const xata = getXataClient();
 
 export const isAdmin = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const token = req.cookies.token;
+    let token = req.cookies.token;
     if (!token) {
-      res.status(403).json({ message: 'Access denied. No token provided.' });
-      return;
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        token = authHeader.split(' ')[1];
+      }
     }
 
     const decoded = verifyToken(token);
