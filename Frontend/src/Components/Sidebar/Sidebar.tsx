@@ -48,11 +48,11 @@ const Sidebar: React.FC = () => {
   // );
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState<boolean>(false);
 
-  // Fetch notifications from API and check for unread notifications
+
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const response = await fetch("http://localhost:3000/notifications");
+        const response = await fetch("http://localhost:3000");
         const data: Notification[] = await response.json();
 
         const unread = data.some((notification) => !notification.isRead);

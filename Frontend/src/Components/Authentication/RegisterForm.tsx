@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { register } from "../../Utils/api";
 import "./RegisterForm.css";
 
 const RegisterForm: React.FC = () => {
@@ -7,15 +8,17 @@ const RegisterForm: React.FC = () => {
     name: "",
     email: "",
     password: "",
-    confirmPassword: "", 
-    role: "team_member", 
+    confirmPassword: "",
+    // role: "team_member",
   });
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prevState) => ({
       ...prevState,
@@ -39,35 +42,25 @@ const RegisterForm: React.FC = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:3000/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-          role: formData.role,
-        }),
-      });
+      const userData = {
+        username: formData.name,
+        email: formData.email,
+        password: formData.password,
+        // role: formData.role,
+      };
 
-      if (!response.ok) {
-        throw new Error("Failed to register user.");
+      const response = await register(userData);
+
+      if (response.status === 201) {
+        setSuccessMessage("User registered successfully!");
+        setFormData({ name: "", email: "", password: "", confirmPassword: "" });
+        
+        setTimeout(() => {
+          navigate("/login");
+        }, 1000);
+      } else {
+        throw new Error("Failed to register user")
       }
-
-      const data = await response.json();
-      console.log("New User Registered:", data);
-
-      setSuccessMessage("User registered successfully!");
-      setFormData({ name: "", email: "", password: "", confirmPassword: "", role: "team_member" });
-
-      localStorage.setItem("token", data.token);
-      
-      setTimeout(() => {
-        navigate("/login");
-      }, 1000);
-
     } catch (err: any) {
       setError(err.message || "An error occurred while registering the user.");
     } finally {
@@ -122,13 +115,6 @@ const RegisterForm: React.FC = () => {
             onChange={handleInputChange}
             required
           />
-        </div>
-        <div>
-          <label>Role: </label>
-          <select name="role" value={formData.role} onChange={handleInputChange} required>
-            <option value="team_member">Team Member</option>
-            <option value="admin">Admin</option>
-          </select>
         </div>
 
         <button type="submit" disabled={loading}>
