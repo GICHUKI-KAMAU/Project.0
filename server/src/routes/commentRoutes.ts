@@ -4,7 +4,9 @@ import { authMiddleware } from '../middlewares/authMiddleware';
 
 const router = Router();
 
-router.post('/', authMiddleware, CommentController.createComment);
-router.get('/:taskId', authMiddleware, CommentController.getCommentsByTask);
+// router.post('/', authMiddleware, CommentController.createComment);
+// router.get('/:taskId', authMiddleware, CommentController.getCommentsByTask);
+router.post('/', CommentController.createComment);
+router.get('/:taskId', CommentController.getCommentsByTask);
 
 export default router;
