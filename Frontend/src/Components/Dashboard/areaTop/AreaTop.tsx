@@ -44,7 +44,7 @@ const AreaTop: React.FC = () => {
 
   const fetchUsersData = async () => {
     try {
-      const response = await fetch("http://localhost:3500/api/auth/users", {
+      const response = await fetch("http://localhost:3500/api/auth/login", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("authToken")}`,
         },
@@ -53,6 +53,7 @@ const AreaTop: React.FC = () => {
         throw new Error("Failed to fetch users");
       }
       const users = await response.json();
+      console.log(users)
 
 
       const loggedInUser = users.find((user: { email: string }) => user.email === loggedInEmail);

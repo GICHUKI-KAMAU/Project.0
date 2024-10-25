@@ -45,9 +45,9 @@ const CreateTeamForm: React.FC = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await fetch("http://localhost:3000/users");
+        const response = await fetch("http://localhost:3500/api/auth/users");
         if (!response.ok) {
-          // throw new Error("Failed to fetch users.");
+          throw new Error("Failed to fetch users.");
         }
         const data: User[] = await response.json();
         setUsers(data);
@@ -92,7 +92,7 @@ const CreateTeamForm: React.FC = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:3000/teams", {
+      const response = await fetch("http://localhost:3500/api/teams", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
