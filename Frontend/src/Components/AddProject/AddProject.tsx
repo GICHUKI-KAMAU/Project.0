@@ -24,20 +24,20 @@ const AddProjectForm: React.FC = () => {
   const [projectName, setProjectName] = useState<string>("");
   const [teamId, setTeamId] = useState<string>("");
   const [teams, setTeams] = useState<{ id: string; name: string }[]>([]);
-  const [searchTerm, setSearchTerm] = useState<string>(""); // State for search term
-  const [loading, setLoading] = useState<boolean>(true); // Loading state
-  const [error, setError] = useState<string | null>(null); // Error state
-  const [successMessage, setSuccessMessage] = useState<string | null>(null); // Success message state
+  const [searchTerm, setSearchTerm] = useState<string>(""); 
+  const [loading, setLoading] = useState<boolean>(true); 
+  const [error, setError] = useState<string | null>(null); 
+  const [successMessage, setSuccessMessage] = useState<string | null>(null); 
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
   // Fetch teams from the API when the component mounts
   useEffect(() => {
     const fetchTeams = async () => {
       try {
-        const response = await fetch("http://localhost:3000/teams");
+        const response = await fetch("http://localhost:3500/api/teams");
         if (response.ok) {
           const data = await response.json();
-          setTeams(data); // Set the teams state with the fetched data
+          setTeams(data); 
         } else {
           throw new Error("Failed to fetch teams");
         }
@@ -69,7 +69,7 @@ const AddProjectForm: React.FC = () => {
 
     try {
       // Send POST request to the API to add the project
-      const response = await fetch("http://localhost:3000/projects", {
+      const response = await fetch("http://localhost:3500/api/projects", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

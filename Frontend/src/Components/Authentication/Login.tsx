@@ -35,7 +35,7 @@ const Login: React.FC = () => {
         const data: { user: { username: string }, token: string } = response.data;
 
         localStorage.setItem("authToken", data.token);
-        // setSuccessMessage(`Welcome, ${data.user.username}! You are logged in.`);
+        setSuccessMessage(`Welcome, ${data.user.username}! You are logged in.`);
 
         navigate("/");
       } else {

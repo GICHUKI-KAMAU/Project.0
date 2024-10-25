@@ -40,7 +40,7 @@ const AssignTaskForm: React.FC = () => {
   // Fetch available projects from API
   const fetchProjects = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/projects");
+      const response = await axios.get("http://localhost:3500/api/projects");
       setProjects(response.data as Project[]);
     } catch (error) {
       console.error("Error fetching projects", error);
@@ -50,7 +50,7 @@ const AssignTaskForm: React.FC = () => {
   // Fetch available teams from API
   const fetchTeams = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/teams");
+      const response = await axios.get("http://localhost:3500/api/teams");
       setTeams(response.data as Team[]);
     } catch (error) {
       console.error("Error fetching teams", error);
@@ -60,7 +60,7 @@ const AssignTaskForm: React.FC = () => {
   // Fetch users to map member IDs to user details
   const fetchUsers = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/users");
+      const response = await axios.get("http://localhost:3500/api/auth/users");
       const users = response.data as User[];
       const userDetailsMap: { [key: string]: User } = {};
       users.forEach(user => {
@@ -109,7 +109,7 @@ const AssignTaskForm: React.FC = () => {
     };
 
     try {
-      await axios.post("http://localhost:3000/tasks", newTask);
+      await axios.post("http://localhost:3500/api/tasks", newTask);
       alert("Task successfully assigned!");
       // Clear the form
       setTaskDescription("");
@@ -123,14 +123,13 @@ const AssignTaskForm: React.FC = () => {
     }
   };
 
-  // Fetch the list of projects, teams, and users on component mount
   useEffect(() => {
     fetchProjects();
     fetchTeams();
     fetchUsers();
   }, []);
 
-  // Fetch team members whenever the selected project changes
+
   useEffect(() => {
     fetchTeamMembers();
   }, [selectedProjectId]);
@@ -201,7 +200,7 @@ const AssignTaskForm: React.FC = () => {
           >
             <option value="" disabled>Select a member</option>
             {teamMembers.map((memberId) => {
-              const user = userDetails[memberId]; // Get user details for the member
+              const user = userDetails[memberId]; 
               return (
                 <option key={memberId} value={memberId}>
                   {user ? `${user.email} (${user.name})` : memberId} {/* Display email and name */}

@@ -52,7 +52,7 @@ const Sidebar: React.FC = () => {
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const response = await fetch("http://localhost:3000");
+        const response = await fetch("");
         const data: Notification[] = await response.json();
 
         const unread = data.some((notification) => !notification.isRead);
