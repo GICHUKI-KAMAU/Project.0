@@ -1,25 +1,35 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useAuth } from "../../context/AuthContext"; 
 import "./CreateTeamForm.css";
-import mockData from "../MockData/mock.json";
 
-// Simulated logged-in user data (in a real app, you'd get this from authentication)
-const loggedInUser = {
-  id: "1", // This represents the logged-in user’s ID
-  name: "John Doe",
-  email: "johndoe@example.com",
-  role: "admin", // User's role (change to "user" to test non-admin access)
-};
+// Debounce Hook to delay updating the search results
+function useDebounce(value: string, delay: number) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
 
 interface User {
   id: string;
   name: string;
   email: string;
+  password: string; 
   role: string;
 }
 
 const CreateTeamForm: React.FC = () => {
-  const users: User[] = mockData.users;
-
+  const { user } = useAuth();
+  const [users, setUsers] = useState<User[]>([]);
   const [teamName, setTeamName] = useState("");
   const [description, setDescription] = useState("");
   const [selectedMembers, setSelectedMembers] = useState<User[]>([]);
@@ -28,9 +38,30 @@ const CreateTeamForm: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  // Filter users based on the search term
+  // Debounce the search term to reduce unnecessary re-renders
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+  // Fetch users from the API
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await fetch("http://localhost:3500/api/auth/users");
+        if (!response.ok) {
+          throw new Error("Failed to fetch users.");
+        }
+        const data: User[] = await response.json();
+        setUsers(data);
+      } catch (err: any) {
+        setError(err.message || "An error occurred while fetching users.");
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
+  // Filter users based on the debounced search term
   const filteredUsers = users.filter((user) =>
-    user.email.toLowerCase().includes(searchTerm.toLowerCase())
+    user.email.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
   );
 
   // Handle adding members to the team
@@ -45,6 +76,7 @@ const CreateTeamForm: React.FC = () => {
     setSelectedMembers(selectedMembers.filter((member) => member.id !== userId));
   };
 
+  // Handle form submission to create a new team
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setLoading(true);
@@ -56,11 +88,11 @@ const CreateTeamForm: React.FC = () => {
       name: teamName,
       description: description,
       members: selectedMembers.map((member) => member.id),
-      adminId: loggedInUser.id, // Include adminId as the logged-in user’s ID
+      adminId: user?.id, // Include adminId as the logged-in user’s ID
     };
 
     try {
-      const response = await fetch("http://localhost:3000/teams", {
+      const response = await fetch("http://localhost:3500/api/teams", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -87,7 +119,7 @@ const CreateTeamForm: React.FC = () => {
   };
 
   // Render form if user is admin, otherwise show "Access Denied" message
-  if (loggedInUser.role !== "admin") {
+  if (!user || user.role !== "admin") {
     return <p>You do not have permission to create a team.</p>;
   }
 

@@ -8,7 +8,8 @@ const router = Router();
 router.post('/signup', AuthController.signup);
 router.post('/login', AuthController.login);
 router.post('/logout', AuthController.logout);
-router.get('/users', isAdmin, AuthController.getUsers);
-router.get('/users/:id', isAdmin, authMiddleware, AuthController.getUserById);
-
+// router.get('/users', isAdmin, AuthController.getUsers);
+router.get('/users', AuthController.getUsers);
+// router.get('/users/:id', isAdmin, authMiddleware, AuthController.getUserById);
+router.get('/users/:id', AuthController.getUserById);
 export default router;

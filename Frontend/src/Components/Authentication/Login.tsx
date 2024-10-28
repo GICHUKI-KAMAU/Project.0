@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { login as apiLogin } from "../../Utils/api"; 
 import "./Login.css";
 
 const Login: React.FC = () => {
@@ -17,38 +18,36 @@ const Login: React.FC = () => {
     else if (name === "password") setPassword(value);
   };
 
-  // Handle form submission
   const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
     setErrorMessage(null);
     setSuccessMessage(null);
 
     try {
-      // Fetch users from the API
-      const response = await fetch("http://localhost:3000/users");
-      if (!response.ok) {
-        throw new Error("Failed to fetch users");
-      }
+      const userData = { username: "", email, password };
+      
 
-      const users = await response.json();
+      const response = await apiLogin(userData) as {
+        status: number; data: { user: { username: string }, token: string } 
+};
 
-      // Find the user by email and password
-      const user = users.find(
-        (user: { email: string; password: string }) =>
-          user.email === email && user.password === password
-      );
+      if (response.status === 200) {
+        const data: { user: { username: string }, token: string } = response.data;
 
-      if (user) {
-        setSuccessMessage(`Welcome, ${user.name}! You are logged in.`);
-        setTimeout(() => {
-          navigate("/");
-        }, 1000);
+        localStorage.setItem("authToken", data.token);
+        setSuccessMessage(`Welcome, ${data.user.username}! You are logged in.`);
+
+        navigate("/");
       } else {
         setErrorMessage("Invalid email or password.");
       }
-    } catch (error) {
-      console.error("Error during login:", error);
-      setErrorMessage("An error occurred. Please try again later.");
+    } catch (error: any) {
+      console.error(error);
+      if (error.response && error.response.status === 401) {
+        setErrorMessage("Invalid email or password.");
+      } else {
+        setErrorMessage("An error occurred. Please try again later.");
+      }
     }
   };
 

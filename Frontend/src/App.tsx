@@ -15,7 +15,8 @@ import Login from "./Components/Authentication/Login";
 import AddProjectForm from "./Components/AddProject/AddProject";
 import AssignTaskForm from "./Components/AddTask/AssignTask";
 import Notifications from "./Components/Notification/Notification";
-// import HomePage from "./pages/HomePage";
+import { AuthProvider } from './context/AuthContext'; 
+import ProtectedRoute from './ProtectedRoute';
 
 function App() {
   const themeContext = useContext(ThemeContext);
@@ -41,17 +42,18 @@ function App() {
 
 
   return (
-    <>
+    <AuthProvider>
       <Router>
         <Routes>
           <Route element={<BaseLayout />}>
             <Route path='/' element={<Dashboard />} />
-            <Route path='/createTeam' element={<CreateTeamForm />} />
             <Route path="/register" element={<RegisterForm />} /> 
             <Route path="/login" element={<Login />} />
-            <Route path="/addproject" element={<AddProjectForm />} />
+
+            <Route path='/createTeam' element={<ProtectedRoute element={<CreateTeamForm />} />} />
+            <Route path="/addproject" element={<ProtectedRoute element={<AddProjectForm />} />} />
             <Route path="/addtask" element={<AssignTaskForm />} />
-            <Route path="/notification" element={<Notifications />} /> 
+            <Route path="/notification" element={<Notifications />} />
         
             {/* <Route index element={<HomePage />} /> */}
           </Route>
@@ -69,7 +71,7 @@ function App() {
         </button>
 
       </Router>
-    </>
+    </AuthProvider>
   )
 }
 

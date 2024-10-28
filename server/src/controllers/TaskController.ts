@@ -49,7 +49,8 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
     const taskStatus = validStatuses.includes(status) ? status : 'waiting';
 
     const task = await xata.db.task.create({
-      description,
+      description, 
+      // desc
       due_date: formattedDueDate,
       AssignedToId: user.xata_id,
       project_id: project.xata_id,

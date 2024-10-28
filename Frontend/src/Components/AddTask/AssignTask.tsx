@@ -5,47 +5,85 @@ import './AssignTask.css';
 interface Project {
   id: string;
   name: string;
+  teamId: string;
+}
+
+interface Team {
+  id: string;
+  name: string;
+  members?: string[];
+}
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
 }
 
 const AssignTaskForm: React.FC = () => {
   const [taskDescription, setTaskDescription] = useState<string>("");
   const [status, setStatus] = useState<string>("in-progress");
   const [dueDate, setDueDate] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
+  const [] = useState<string>("");
 
   const [projects, setProjects] = useState<Project[]>([]);
+  const [teams, setTeams] = useState<Team[]>([]);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [assignedToId, setAssignedToId] = useState<string | null>(null);
+  const [teamMembers, setTeamMembers] = useState<string[]>([]);
+  const [userDetails, setUserDetails] = useState<{ [key: string]: User }>({}); // State to hold user details
 
-  const [loading, setLoading] = useState<boolean>(false);
+  const [] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Fetch the user ID based on the email entered
-  const fetchUserIdByEmail = async (email: string) => {
-    try {
-      setLoading(true);
-      const response = await axios.get(`http://localhost:3000/users?email=${email}`);
-      const user = (response.data as { id: string }[])[0]; // Assuming the API returns an array of users
-      if (user && user.id) {
-        setAssignedToId(user.id); // Set the user ID based on the email
-        setError(null);
-      } else {
-        setError("User not found.");
-      }
-      setLoading(false);
-    } catch (error) {
-      setError("Error fetching user ID.");
-      setLoading(false);
-    }
-  };
 
   // Fetch available projects from API
   const fetchProjects = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/projects");
-      setProjects(response.data as Project[]); 
+      const response = await axios.get("http://localhost:3500/api/projects");
+      setProjects(response.data as Project[]);
     } catch (error) {
       console.error("Error fetching projects", error);
+    }
+  };
+
+  // Fetch available teams from API
+  const fetchTeams = async () => {
+    try {
+      const response = await axios.get("http://localhost:3500/api/teams");
+      setTeams(response.data as Team[]);
+    } catch (error) {
+      console.error("Error fetching teams", error);
+    }
+  };
+
+  // Fetch users to map member IDs to user details
+  const fetchUsers = async () => {
+    try {
+      const response = await axios.get("http://localhost:3500/api/auth/users");
+      const users = response.data as User[];
+      const userDetailsMap: { [key: string]: User } = {};
+      users.forEach(user => {
+        userDetailsMap[user.id] = user; // Map user ID to user details
+      });
+      setUserDetails(userDetailsMap);
+    } catch (error) {
+      console.error("Error fetching users", error);
+    }
+  };
+
+  // Fetch team members based on the selected project
+  const fetchTeamMembers = () => {
+    if (selectedProjectId) {
+      const selectedProject = projects.find(project => project.id === selectedProjectId);
+      if (selectedProject) {
+        const team = teams.find(team => team.id === selectedProject.teamId);
+        if (team && team.members) {
+          setTeamMembers(team.members);
+        } else {
+          setTeamMembers([]);
+        }
+      }
     }
   };
 
@@ -53,7 +91,7 @@ const AssignTaskForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!assignedToId) {
-      setError("Please enter a valid email.");
+      setError("Please select a valid team member.");
       return;
     }
 
@@ -66,36 +104,35 @@ const AssignTaskForm: React.FC = () => {
       description: taskDescription,
       status,
       dueDate,
-      projectId: selectedProjectId, 
-      assignedToId, 
+      projectId: selectedProjectId,
+      assignedToId,
     };
 
     try {
-      await axios.post("http://localhost:3000/tasks", newTask);
+      await axios.post("http://localhost:3500/api/tasks", newTask);
       alert("Task successfully assigned!");
       // Clear the form
       setTaskDescription("");
       setStatus("in-progress");
       setDueDate("");
-      setEmail("");
       setAssignedToId(null);
       setSelectedProjectId(null);
+      setTeamMembers([]);
     } catch (error) {
       setError("Error assigning task.");
     }
   };
 
-  // Fetch user ID whenever the email changes
-  useEffect(() => {
-    if (email) {
-      fetchUserIdByEmail(email);
-    }
-  }, [email]);
-
-  // Fetch the list of projects on component mount
   useEffect(() => {
     fetchProjects();
+    fetchTeams();
+    fetchUsers();
   }, []);
+
+
+  useEffect(() => {
+    fetchTeamMembers();
+  }, [selectedProjectId]);
 
   return (
     <div className="form-container">
@@ -154,19 +191,27 @@ const AssignTaskForm: React.FC = () => {
         </div>
 
         <div>
-          <label htmlFor="email">Assign to (Email)</label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+          <label htmlFor="member">Assign to (Email)</label>
+          <select
+            id="member"
+            value={assignedToId || ""}
+            onChange={(e) => setAssignedToId(e.target.value)}
             required
-          />
-          {loading && <p>Loading user...</p>}
+          >
+            <option value="" disabled>Select a member</option>
+            {teamMembers.map((memberId) => {
+              const user = userDetails[memberId]; 
+              return (
+                <option key={memberId} value={memberId}>
+                  {user ? `${user.email} (${user.name})` : memberId} {/* Display email and name */}
+                </option>
+              );
+            })}
+          </select>
           {error && <p className="error">{error}</p>}
         </div>
 
-        <button type="submit" disabled={loading || !assignedToId}>
+        <button type="submit">
           Assign Task
         </button>
       </form>
