@@ -8,17 +8,21 @@ const xata = getXataClient();
 export const AuthController = {
   signup: async (req: Request, res: Response): Promise<void> => {
     try {
-      const { email, password, username } = req.body;
+      const { email, password, username, role = 'user' } = req.body; // Default role is 'user'
+
+      // Ensure the role is either 'user' or 'admin'
+      if (role !== 'user' && role !== 'admin') {
+        res.status(400).json({ message: 'Invalid role. Role must be either "user" or "admin".' });
+        return;
+      }
 
       const existingUser = await xata.db.Users.filter({ email }).getFirst();
-
       if (existingUser) {
         res.status(400).json({ message: 'Email already in use' });
         return;
       }
 
       const existingUsername = await xata.db.Users.filter({ username }).getFirst();
-
       if (existingUsername) {
         res.status(400).json({ message: 'Username already taken' });
         return;
@@ -30,10 +34,10 @@ export const AuthController = {
         email,
         password: hashedPassword,
         username,
-        role: ['user'],
+        role, // Set the validated role
       });
 
-      const token = generateToken({ id: newUser.xata_id, role: newUser.role[0] });
+      const token = generateToken({ id: newUser.xata_id, role });
 
       res.cookie('token', token, {
         httpOnly: true,
@@ -42,9 +46,35 @@ export const AuthController = {
       });
 
       res.status(201).json({ token });
-
     } catch (error) {
       console.error('Error during signup:', error);
+      res.status(500).json({ error: 'Server error' });
+    }
+  },
+
+  updateUserRole: async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const { role } = req.body;
+
+      // Validate role
+      if (role !== 'user' && role !== 'admin') {
+        res.status(400).json({ message: 'Invalid role. Role must be either "user" or "admin".' });
+        return;
+      }
+
+      const user = await xata.db.Users.read(id);
+      if (!user) {
+        res.status(404).json({ message: 'User not found' });
+        return;
+      }
+
+      // Update the user's role
+      await xata.db.Users.update(id, { role });
+
+      res.status(200).json({ message: 'User role updated successfully' });
+    } catch (error) {
+      console.error('Error updating user role:', error);
       res.status(500).json({ error: 'Server error' });
     }
   },
@@ -64,15 +94,14 @@ export const AuthController = {
 
       const token = generateToken({
         id: user.xata_id,
-        role: user.role[0],
+        role: user.role,
         team_lead: isTeamLead,
       });
 
-      // Set token as an HTTP-only cookie
       res.cookie('token', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        maxAge: 24 * 60 * 60 * 1000, // 1 day expiration
+        maxAge: 24 * 60 * 60 * 1000,
       });
 
       res.status(200).json({ token });
@@ -83,14 +112,13 @@ export const AuthController = {
   },
 
   logout: (req: Request, res: Response): void => {
-    // Clear the token cookie
     res.clearCookie('token');
     res.status(200).json({ message: 'Logged out successfully' });
   },
 
   getUsers: async (req: Request, res: Response): Promise<void> => {
     try {
-      const users = await xata.db.Users.getAll(); // Fetch all users from the Users table
+      const users = await xata.db.Users.getAll();
       res.status(200).json(users);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -99,10 +127,10 @@ export const AuthController = {
   },
 
   getUserById: async (req: Request, res: Response): Promise<void> => {
-    const { id } = req.params; // Get the user ID from the request parameters
+    const { id } = req.params;
 
     try {
-      const user = await xata.db.Users.read(id); // Fetch user by ID from the Users table
+      const user = await xata.db.Users.read(id);
 
       if (!user) {
         res.status(404).json({ message: 'User not found' });
@@ -115,5 +143,4 @@ export const AuthController = {
       res.status(500).json({ error: 'Server error' });
     }
   },
-
 };
