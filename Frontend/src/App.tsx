@@ -27,7 +27,7 @@ function App() {
 
   const { openSidebar } = useContext(SidebarContext) || {};
 
-  // adding dark-mode class if the dark mode is set on to the body tag
+
   useEffect(() => {
     if (theme === DARK_THEME) {
       document.body.classList.add("dark-mode");

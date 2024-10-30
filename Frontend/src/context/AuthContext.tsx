@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
-// Define a User interface (optional) if you plan to store user info in the future
 interface User {
   id: string;
   name: string;
@@ -22,24 +21,32 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    // Example of restoring authentication from localStorage or sessionStorage
-    const storedUser = localStorage.getItem('user');
+    const storedUser = localStorage.getItem('auth'); 
+    console.log('Stored user data:', storedUser); 
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
-      setIsAuthenticated(true);
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+        setIsAuthenticated(true);
+      } catch (error) {
+        console.error("Error parsing stored user data:", error);
+        localStorage.removeItem('user'); 
+      }
     }
   }, []);
 
   const login = (userData: User) => {
     setIsAuthenticated(true);
     setUser(userData);
-    localStorage.setItem('user', JSON.stringify(userData)); // Store user data (optional)
+    localStorage.setItem("auth", JSON.stringify(user)); 
+    console.log('User logged in:', userData); 
   };
 
   const logout = () => {
     setIsAuthenticated(false);
     setUser(null);
-    localStorage.removeItem('user'); // Clear stored user data
+    localStorage.removeItem('auth'); 
+    console.log('User logged out'); 
   };
 
   return (

@@ -24,9 +24,9 @@ const AreaCards = () => {
         const response = await axios.get<{ status: string }[]>("http://localhost:3500/api/tasks");
         const tasks = response.data;
 
-        const inProgressTasks = tasks.filter(task => task.status === "in-progress").length;
-        const waitingTasks = tasks.filter(task => task.status === "waiting").length;
-        const completedTaskCount = tasks.filter(task => task.status === "completed").length; 
+        const inProgressTasks = tasks.filter(task => task.status[0] === "in-progress").length;
+        const waitingTasks = tasks.filter(task => task.status[0] === "waiting").length;
+        const completedTaskCount = tasks.filter(task => task.status[0] === "completed").length; 
 
         const countPendingTasks = inProgressTasks + waitingTasks;
         setPendingTasks(countPendingTasks);

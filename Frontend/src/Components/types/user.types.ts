@@ -6,7 +6,7 @@ type User = {
 };
 
 export type UserRegister = Omit<User, "role">;
-export type UserLogin = Pick<User, "email" | "password" | "username">;
+export type UserLogin = Pick<User, "email" | "password">;
 
 type Task = {
     id: string;

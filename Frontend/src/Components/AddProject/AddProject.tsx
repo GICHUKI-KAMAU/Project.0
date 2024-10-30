@@ -29,8 +29,7 @@ const AddProjectForm: React.FC = () => {
   const [error, setError] = useState<string | null>(null); 
   const [successMessage, setSuccessMessage] = useState<string | null>(null); 
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
-
-  // Fetch teams from the API when the component mounts
+  
   useEffect(() => {
     const fetchTeams = async () => {
       try {
@@ -55,13 +54,11 @@ const AddProjectForm: React.FC = () => {
     team.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
   );
 
-  // Function to handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setSuccessMessage(null);
 
-    // Construct the project data
     const newProject = {
       name: projectName,
       teamId: teamId,
@@ -79,8 +76,8 @@ const AddProjectForm: React.FC = () => {
 
       if (response.ok) {
         alert("Project added successfully!");
-        setSuccessMessage("Project added successfully!"); // Set success message
-        // Optionally, reset the form
+        setSuccessMessage("Project added successfully!"); 
+    
         setProjectName("");
         setTeamId("");
       } else {
@@ -92,12 +89,9 @@ const AddProjectForm: React.FC = () => {
     }
   };
 
-  // Render loading state
   if (loading) {
     return <p>Loading teams...</p>;
   }
-
-  // Render form if user is admin, otherwise show "Access Denied" message
   if (!user || user.role !== "admin") {
     return <p>You do not have permission to create a project.</p>;
   }
@@ -108,7 +102,7 @@ const AddProjectForm: React.FC = () => {
       {error && <p className="error-message">{error}</p>}
       {successMessage && <p className="success-message">{successMessage}</p>}
       <form onSubmit={handleSubmit} className="add-project-form">
-        <div>
+        <div className="project-name">
           <label htmlFor="projectName">Project Name:</label>
           <input
             type="text"
@@ -117,8 +111,6 @@ const AddProjectForm: React.FC = () => {
             onChange={(e) => setProjectName(e.target.value)}
             required
           />
-        </div>
-        <div>
           <label htmlFor="teamId">Select Team:</label>
           <input
             type="text"

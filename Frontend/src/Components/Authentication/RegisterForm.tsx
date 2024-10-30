@@ -9,7 +9,7 @@ const RegisterForm: React.FC = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    // role: "team_member",
+    
   });
 
   const [loading, setLoading] = useState<boolean>(false);
