@@ -7,7 +7,6 @@ import {
   MdOutlineLogout,
   MdOutlineLogin,
   MdOutlineMessage,
-  // MdOutlinePeople,
   MdAssignment,
   MdOutlineSettings,
   MdOutlineAdd,
@@ -17,7 +16,6 @@ import "./Sidebar.scss";
 import { SidebarContext } from "../../context/SidebarContext";
 import { useAuth } from "../../context/AuthContext";
 
-// Define the notification structure
 interface Notification {
   id: string;
   userId: string;
@@ -40,12 +38,13 @@ const Sidebar: React.FC = () => {
   const { isSidebarOpen, closeSidebar } = sidebarContext;
   const navbarRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
-  const userRole = user?.role;
+  const role = user ? user.role : null;
 
+  console.log("the user is",user);
 
-  // const [isLoggedIn, setIsLoggedIn] = useState<boolean>(
-  //   localStorage.getItem("isLoggedIn") === "true"
-  // );
+  const [] = useState<boolean>(
+    localStorage.getItem("isLoggedIn") === "true"
+  );
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState<boolean>(false);
 
 
@@ -113,7 +112,7 @@ const Sidebar: React.FC = () => {
                 <span className="menu-link-text">Dashboard</span>
               </NavLink>
             </li>
-            {userRole === "admin" && (
+            {role === "admin" && (
               <li className="menu-item">
                 <NavLink to="/createTeam" className={({ isActive }) => (isActive ? "menu-link active" : "menu-link")}>
                   <span className="menu-link-icon">
@@ -123,7 +122,7 @@ const Sidebar: React.FC = () => {
                 </NavLink>
               </li>
             )}
-            {userRole === "admin" && (
+            {role === "admin" && (
               <li className="menu-item">
                 <NavLink to="/addproject" className={({ isActive }) => (isActive ? "menu-link active" : "menu-link")}>
                   <span className="menu-link-icon">
@@ -133,7 +132,7 @@ const Sidebar: React.FC = () => {
                 </NavLink>
               </li>
             )}
-            {userRole === "team-lead" &&(
+            {role === "team-lead" &&(
               <li className="menu-item">
                 <NavLink to="/addtask" className={({ isActive }) => (isActive ? "menu-link active" : "menu-link")}>
                   <span className="menu-link-icon">

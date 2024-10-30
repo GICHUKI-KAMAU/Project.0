@@ -27,7 +27,6 @@ label {
     margin-bottom: 5px;
 }
 
-/* Input styling */
 input {
     padding: 10px;
     font-size: 14px;
@@ -37,12 +36,10 @@ input {
     transition: border 0.3s ease;
 }
 
-/* Input focus state */
 input:focus {
     border-color: #4caf50;
 }
 
-/* Button styling */
 button {
     padding: 10px;
     font-size: 16px;
@@ -55,7 +52,6 @@ button {
     transition: background-color 0.3s ease;
 }
 
-/* Button hover effect */
 button:hover {
     background-color: #45a049;
 }

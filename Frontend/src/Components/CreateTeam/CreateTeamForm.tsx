@@ -20,6 +20,7 @@ function useDebounce(value: string, delay: number) {
 }
 
 interface User {
+  username: string;
   id: string;
   name: string;
   email: string;
@@ -71,28 +72,27 @@ const CreateTeamForm: React.FC = () => {
     }
   };
 
-  // Handle removing members from the team
   const removeMember = (userId: string) => {
     setSelectedMembers(selectedMembers.filter((member) => member.id !== userId));
   };
 
-  // Handle form submission to create a new team
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setLoading(true);
     setError(null);
     setSuccessMessage(null);
 
-    // Create the new team object including the logged-in user's ID as adminId
     const newTeam = {
       name: teamName,
       description: description,
       members: selectedMembers.map((member) => member.id),
-      adminId: user?.id, // Include adminId as the logged-in user’s ID
+      adminId: user?.id, 
     };
 
     try {
-      const response = await fetch("http://localhost:3500/api/teams", {
+      const response = await fetch("http://localhost:3500/api/teams", 
+        {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -118,7 +118,6 @@ const CreateTeamForm: React.FC = () => {
     }
   };
 
-  // Render form if user is admin, otherwise show "Access Denied" message
   if (!user || user.role !== "admin") {
     return <p>You do not have permission to create a team.</p>;
   }
@@ -158,7 +157,7 @@ const CreateTeamForm: React.FC = () => {
         <ul className="user-list">
           {filteredUsers.map((user) => (
             <li key={user.id} onClick={() => addMember(user)}>
-              {user.email} ({user.name})
+              {user.email} ({user.username})
             </li>
           ))}
         </ul>
@@ -174,7 +173,7 @@ const CreateTeamForm: React.FC = () => {
                 className="remove-member"
                 onClick={() => removeMember(member.id)}
               >
-                &times; {/* X for removing */}
+                &times; 
               </span>
             </li>
           ))}

@@ -1,20 +1,24 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import './AssignTask.css';
+import "./AssignTask.css";
 
 interface Project {
+  team_ID: string;
+  xata_id: string;
   id: string;
   name: string;
   teamId: string;
 }
 
 interface Team {
+  xata_id: string;
   id: string;
   name: string;
   members?: string[];
 }
 
 interface User {
+  username: string;
   id: string;
   name: string;
   email: string;
@@ -29,29 +33,31 @@ const AssignTaskForm: React.FC = () => {
 
   const [projects, setProjects] = useState<Project[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
-  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
+    null
+  );
   const [assignedToId, setAssignedToId] = useState<string | null>(null);
   const [teamMembers, setTeamMembers] = useState<string[]>([]);
-  const [userDetails, setUserDetails] = useState<{ [key: string]: User }>({}); // State to hold user details
+  const [userDetails, setUserDetails] = useState<{ [key: string]: User }>({});
 
   const [] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch available projects from API
   const fetchProjects = async () => {
     try {
       const response = await axios.get("http://localhost:3500/api/projects");
       setProjects(response.data as Project[]);
+      console.log("the projects are", response.data);
     } catch (error) {
       console.error("Error fetching projects", error);
     }
   };
 
-  // Fetch available teams from API
   const fetchTeams = async () => {
     try {
       const response = await axios.get("http://localhost:3500/api/teams");
       setTeams(response.data as Team[]);
+      console.log("the teams are", response.data);
     } catch (error) {
       console.error("Error fetching teams", error);
     }
@@ -63,8 +69,8 @@ const AssignTaskForm: React.FC = () => {
       const response = await axios.get("http://localhost:3500/api/auth/users");
       const users = response.data as User[];
       const userDetailsMap: { [key: string]: User } = {};
-      users.forEach(user => {
-        userDetailsMap[user.id] = user; // Map user ID to user details
+      users.forEach((user) => {
+        userDetailsMap[user.id] = user;
       });
       setUserDetails(userDetailsMap);
     } catch (error) {
@@ -75,12 +81,19 @@ const AssignTaskForm: React.FC = () => {
   // Fetch team members based on the selected project
   const fetchTeamMembers = () => {
     if (selectedProjectId) {
-      const selectedProject = projects.find(project => project.id === selectedProjectId);
-      if (selectedProject) {
-        const team = teams.find(team => team.id === selectedProject.teamId);
+      const selectedProject = projects.find(
+        (project) => project.xata_id === selectedProjectId
+      );
+
+      if (selectedProject && selectedProject.team_ID) {
+        const teamId = selectedProject.team_ID.xata_id;
+
+        const team = teams.find((team) => team.xata_id === teamId);
+
         if (team && team.members) {
           setTeamMembers(team.members);
         } else {
+          console.log("No team found for the selected project.");
           setTeamMembers([]);
         }
       }
@@ -110,8 +123,8 @@ const AssignTaskForm: React.FC = () => {
 
     try {
       await axios.post("http://localhost:3500/api/tasks", newTask);
+      
       alert("Task successfully assigned!");
-      // Clear the form
       setTaskDescription("");
       setStatus("in-progress");
       setDueDate("");
@@ -128,7 +141,6 @@ const AssignTaskForm: React.FC = () => {
     fetchTeams();
     fetchUsers();
   }, []);
-
 
   useEffect(() => {
     fetchTeamMembers();
@@ -181,9 +193,11 @@ const AssignTaskForm: React.FC = () => {
             onChange={(e) => setSelectedProjectId(e.target.value)}
             required
           >
-            <option value="" disabled>Select a project</option>
+            <option value="" disabled>
+              Select a project
+            </option>
             {projects.map((project) => (
-              <option key={project.id} value={project.id}>
+              <option key={project.xata_id} value={project.xata_id}>
                 {project.name}
               </option>
             ))}
@@ -198,12 +212,17 @@ const AssignTaskForm: React.FC = () => {
             onChange={(e) => setAssignedToId(e.target.value)}
             required
           >
-            <option value="" disabled>Select a member</option>
-            {teamMembers.map((memberId) => {
-              const user = userDetails[memberId]; 
+            <option value="" disabled>
+              Select a member
+            </option>
+            {teamMembers.map((memberUsername) => {
+              const user = Object.values(userDetails).find(
+                (u) => u.username === memberUsername
+              ); 
+
               return (
-                <option key={memberId} value={memberId}>
-                  {user ? `${user.email} (${user.name})` : memberId} {/* Display email and name */}
+                <option key={memberUsername} value={user?.id || memberUsername}>
+                  {user ? `${user.email} (${user.username})` : memberUsername}
                 </option>
               );
             })}
@@ -211,9 +230,7 @@ const AssignTaskForm: React.FC = () => {
           {error && <p className="error">{error}</p>}
         </div>
 
-        <button type="submit">
-          Assign Task
-        </button>
+        <button type="submit">Assign Task</button>
       </form>
     </div>
   );

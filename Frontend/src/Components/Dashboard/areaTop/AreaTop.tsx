@@ -8,7 +8,6 @@ import "react-date-range/dist/theme/default.css";
 import { addDays, format } from "date-fns";
 import { DateRange, RangeKeyDict } from "react-date-range";
 
-// Define the shape of the SidebarContext
 interface SidebarContextType {
   openSidebar: () => void;
 }
@@ -34,17 +33,24 @@ const AreaTop: React.FC = () => {
   useEffect(() => {
     const email = localStorage.getItem("loggedInEmail"); 
     setLoggedInEmail(email);
+
+    const token = localStorage.getItem("authToken")
+    const userInfo = JSON.parse(localStorage.getItem("auth") || "{}");
+    console.log("Decoded user info:", userInfo);
+
+
+    if(token && userInfo) setUsername(userInfo.username)
   }, []);
 
-  useEffect(() => {
-    if (loggedInEmail) {
-      fetchUsersData();
-    }
-  }, [loggedInEmail]);
+  // useEffect(() => {
+  //   if (loggedInEmail) {
+  //     fetchUsersData();
+  //   }
+  // }, [loggedInEmail]);
 
   const fetchUsersData = async () => {
     try {
-      const response = await fetch("http://localhost:3500/api/auth/login", {
+      const response = await fetch("http://localhost:3500/api/auth/users/${id}", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("authToken")}`,
         },
@@ -59,7 +65,7 @@ const AreaTop: React.FC = () => {
       const loggedInUser = users.find((user: { email: string }) => user.email === loggedInEmail);
 
       if (loggedInUser) {
-        setUsername(loggedInUser.name); 
+        setUsername(loggedInUser.username); 
       } else {
         setUsername("Guest");        }
     } catch (error) {
@@ -68,7 +74,6 @@ const AreaTop: React.FC = () => {
     }
   };
 
-  // Handle click outside of the date picker to close it
   const handleClickOutside = (event: MouseEvent) => {
     if (
       dateRangeRef.current &&
@@ -85,7 +90,6 @@ const AreaTop: React.FC = () => {
     };
   }, []);
 
-  // Formatting the selected startDate for display
   const formattedStartDate = format(state[0].startDate, "MMMM dd, yyyy");
 
   return (

@@ -1,13 +1,12 @@
-import React, { useState, useEffect, FormEvent, ReactNode } from 'react';
-import { getTasks } from '../../../Utils/api';
-import './TaskBoard.css';
-import Modal from './Modal';
+import React, { useState, useEffect, FormEvent, Key } from "react";
+import "./TaskBoard.css";
+import Modal from "./Modal";
 
 interface Task {
-  due_date: ReactNode;
+  due_date: string;
   id: string;
   description: string;
-  status: 'waiting' | 'in-progress' | 'completed';
+  status: string[];
   dueDate: string;
   projectId: string;
   assignedToId: string;
@@ -21,6 +20,7 @@ interface Comment {
 }
 
 interface Project {
+  xata_id: Key | null | undefined;
   id: string;
   name: string;
   teamId: string;
@@ -31,34 +31,34 @@ const TaskBoard: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
-  const [userRole, setUserRole] = useState<string>('admin');
+  const [userRole, setUserRole] = useState<string>("");
   const [comments, setComments] = useState<Comment[]>([]);
-  const [userId, setUserId] = useState<string>('1');
-  const [content, setContent] = useState<string>(''); // State for the comment input
+  const [userId] = useState<string>("1");
+  const [content, setContent] = useState<string>("");
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [currentTask, setCurrentTask] = useState<Task | null>(null);
-  const [taskStatuses, setTaskStatuses] = useState<{ [key: string]: Task['status'] }>({});
-  const [dueDate, setDueDate] = useState<string>(''); // State for due date
-  const [projects, setProjects] = useState<Project[]>([]); // State for projects
-  const [selectedProjectId, setSelectedProjectId] = useState<string>(''); // State for selected project
-  const [assignedToId, setAssignedToId] = useState<string>(''); // State for selected team member
+  const [taskStatuses, setTaskStatuses] = useState<{
+    [key: string]: Task["status"];
+  }>({});
+  const [dueDate, setDueDate] = useState<string>("");
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [selectedProjectId, setSelectedProjectId] = useState<string>("");
+  const [teamMembers, setTeamMembers] = useState<{ id: string; name: string }[]>([]);
+  const [assignedToId, setAssignedToId] = useState<string>("");
 
   // Fetch tasks from API
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const response = await fetch('http://localhost:3500/api/tasks');
+        const response = await fetch("http://localhost:3500/api/tasks");
         if (!response.ok) {
-          throw new Error('Failed to fetch tasks');
+          throw new Error("Failed to fetch tasks");
         }
         const data: Task[] = await response.json();
-        if (Array.isArray(data)) {
-          setTasks(data);
-        } else {
-          throw new Error('Tasks data is not an array');
-        }
+        setTasks(data);
+        setLoading(false);
       } catch (err) {
-        console.log("err:", err)
+        console.log("err:", err);
         setError((err as Error).message);
       } finally {
         setLoading(false);
@@ -70,15 +70,18 @@ const TaskBoard: React.FC = () => {
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const response = await fetch('http://localhost:3500/api/comments/tasks');
+        const response = await fetch(
+          `http://localhost:3500/api/comments/task/`
+        );
         if (!response.ok) {
-          throw new Error('Failed to fetch comments');
+          throw new Error("Failed to fetch comments");
         }
         const data: Comment[] = await response.json();
         if (Array.isArray(data)) {
           setComments(data);
+          console.log("Fetch data:", data);
         } else {
-          throw new Error('Comments data is not an array');
+          throw new Error("Comments data is not an array");
         }
       } catch (err) {
         setError((err as Error).message);
@@ -90,15 +93,16 @@ const TaskBoard: React.FC = () => {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await fetch('http://localhost:3500/api/projects');
+        const response = await fetch("http://localhost:3500/api/projects");
+        console.log("The fetched projects", response);
         if (!response.ok) {
-          throw new Error('Failed to fetch projects');
+          throw new Error("Failed to fetch projects");
         }
         const data: Project[] = await response.json();
         if (Array.isArray(data)) {
           setProjects(data);
         } else {
-          throw new Error('Projects data is not an array');
+          throw new Error("Projects data is not an array");
         }
       } catch (err) {
         setError((err as Error).message);
@@ -107,17 +111,16 @@ const TaskBoard: React.FC = () => {
     fetchProjects();
   }, []);
 
-  // Handle loading and error states
   if (loading) return <div>Loading tasks...</div>;
   if (error) return <div>Error: {error}</div>;
 
-  // Group tasks by their status
-  const waitingTasks = tasks.filter(task => task.status === 'waiting');
-  const inProgressTasks = tasks.filter(task => task.status === 'in-progress');
-  const completedTasks = tasks.filter(task => task.status === 'completed');
-
   const handleTaskClick = (taskId: string) => {
     setSelectedTaskId(taskId);
+    const task = tasks.find((task) => task.id === taskId);
+    if (task) {
+      setCurrentTask(task);
+      setDueDate(task.dueDate);
+    }
   };
 
   const handleUpdateTask = (task: Task) => {
@@ -127,10 +130,10 @@ const TaskBoard: React.FC = () => {
 
   const handleAddComment = async (taskId: string, content: string) => {
     try {
-      const response = await fetch('http://localhost:3500/api/comment', {
-        method: 'POST',
+      const response = await fetch("http://localhost:3500/api/comments", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ content, taskId, userId }),
       });
@@ -138,35 +141,37 @@ const TaskBoard: React.FC = () => {
       if (response.ok) {
         const newComment = await response.json();
         setComments((prevComments) => [...prevComments, newComment]);
-        setContent('');
+        setContent("");
       } else {
-        alert('Failed to add comment. Please try again.');
+        alert("Failed to add comment. Please try again.");
       }
     } catch (error) {
-      alert('An error occurred while adding the comment. Please try again.');
+      alert("An error occurred while adding the comment. Please try again.");
     }
   };
 
   const handleDeleteTask = async (taskId: string) => {
-    const confirmDelete = window.confirm('Are you sure you want to delete this task?');
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this task?"
+    );
     if (!confirmDelete) return;
 
     try {
-      const response = await fetch(`http://localhost:3500/api/tasks/:id`, {
-        method: 'DELETE',
+      const response = await fetch(`http://localhost:3500/api/tasks`, {
+        method: "DELETE",
       });
 
       if (response.ok) {
         setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
       } else {
-        alert('Failed to delete task. Please try again.');
+        alert("Failed to delete task. Please try again.");
       }
     } catch (error) {
-      alert('An error occurred while deleting the task. Please try again.');
+      alert("An error occurred while deleting the task. Please try again.");
     }
   };
 
-  const handleStatusChange = (taskId: string, status: Task['status']) => {
+  const handleStatusChange = (taskId: string, status: Task["status"]) => {
     setTaskStatuses((prevStatuses) => ({
       ...prevStatuses,
       [taskId]: status,
@@ -176,10 +181,10 @@ const TaskBoard: React.FC = () => {
   const handleStatusUpdate = async (task: Task) => {
     try {
       const updatedStatus = taskStatuses[task.id] || task.status;
-      const response = await fetch(`http://localhost:3500/api/tasks/:id`, {
-        method: 'PUT',
+      const response = await fetch(`http://localhost:3500/api/tasks/${task.id}`, {
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ ...task, status: updatedStatus }),
       });
@@ -190,10 +195,10 @@ const TaskBoard: React.FC = () => {
           prevTasks.map((t) => (t.id === updatedTask.id ? updatedTask : t))
         );
       } else {
-        alert('Failed to update task status.');
+        alert("Failed to update task status.");
       }
     } catch (error) {
-      alert('An error occurred while updating task status.');
+      alert("An error occurred while updating task status.");
     }
   };
 
@@ -203,7 +208,9 @@ const TaskBoard: React.FC = () => {
     return (
       <div
         key={task.id}
-        className={`task-card ${task.status} ${selectedTaskId === task.id ? 'selected' : ''}`}
+        className={`task-card ${task.status} ${
+          selectedTaskId === task.id ? "selected" : ""
+        }`}
         onClick={() => handleTaskClick(task.id)}
       >
         <p>{task.description}</p>
@@ -221,7 +228,7 @@ const TaskBoard: React.FC = () => {
               onClick={() => {
                 if (content) {
                   handleAddComment(task.id, content);
-                  setContent(''); 
+                  setContent("");
                 }
               }}
             >
@@ -231,17 +238,22 @@ const TaskBoard: React.FC = () => {
             {/* Status Dropdown */}
             <select
               value={selectedStatus}
-              onChange={(e) => handleStatusChange(task.id, e.target.value as Task['status'])}
+              onChange={(e) =>
+                handleStatusChange(task.id, e.target.value as unknown as Task["status"])
+              }
               className="status-dropdown"
             >
-              {['waiting', 'in-progress', 'completed'].map((status) => (
+              {["waiting", "in-progress", "completed"].map((status) => (
                 <option key={status} value={status}>
                   {status.charAt(0).toUpperCase() + status.slice(1)}
                 </option>
               ))}
             </select>
 
-            <button onClick={() => handleStatusUpdate(task)} className="update-status-button">
+            <button
+              onClick={() => handleStatusUpdate(task)}
+              className="update-status-button"
+            >
               Update Status
             </button>
           </div>
@@ -257,10 +269,15 @@ const TaskBoard: React.FC = () => {
             ))}
         </div>
 
-        {selectedTaskId === task.id && userRole === 'admin' && (
+        {selectedTaskId === task.id && userRole[0] === "admin" && (
           <div className="task-actions">
             <button onClick={() => handleUpdateTask(task)}>Update</button>
-            <button className="delete" onClick={() => handleDeleteTask(task.id)}>Delete</button>
+            <button
+              className="delete"
+              onClick={() => handleDeleteTask(task.id)}
+            >
+              Delete
+            </button>
           </div>
         )}
       </div>
@@ -271,7 +288,7 @@ const TaskBoard: React.FC = () => {
     event.preventDefault();
     if (currentTask) {
       handleStatusUpdate(currentTask);
-      setIsModalOpen(false)
+      setIsModalOpen(false);
     }
   };
 
@@ -279,13 +296,19 @@ const TaskBoard: React.FC = () => {
     setSelectedProjectId(event.target.value);
   };
 
-  const handleTeamMemberChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleTeamMemberChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
     setAssignedToId(event.target.value);
   };
 
-  const filteredTasks = tasks.filter(task => {
-    const matchesProject = selectedProjectId ? task.projectId === selectedProjectId : true;
-    const matchesTeamMember = assignedToId ? task.assignedToId === assignedToId : true;
+  const filteredTasks = tasks.filter((task) => {
+    const matchesProject = selectedProjectId
+      ? task.projectId === selectedProjectId
+      : true;
+    const matchesTeamMember = assignedToId
+      ? task.assignedToId === assignedToId
+      : true;
     return matchesProject && matchesTeamMember;
   });
 
@@ -293,13 +316,11 @@ const TaskBoard: React.FC = () => {
     <div className="task-board">
       <h1>Task Board</h1>
 
-      {/* Container for Dropdowns */}
       <div className="dropdown-container">
-        {/* Dropdown for Projects */}
         <select onChange={handleProjectChange} value={selectedProjectId}>
           <option value="">All Projects</option>
-          {projects.map((project) => (-
-            <option key={project.id} value={project.id}>
+          {projects.map((project) => (
+            <option key={project.xata_id} value={String(project.xata_id ?? '')}>
               {project.name}
             </option>
           ))}
@@ -308,24 +329,32 @@ const TaskBoard: React.FC = () => {
         {/* Dropdown for Team Members */}
         <select onChange={handleTeamMemberChange} value={assignedToId}>
           <option value="">All Team Members</option>
-          <option value="1">Team Member 1</option>
-          <option value="2">Team Member 2</option>
-          <option value="3">Team Member 3</option>
+          {teamMembers.map(member => (
+            <option key={member.id} value={member.id}>
+              {member.name}
+            </option>
+          ))}
         </select>
       </div>
 
       <div className="kanban">
         <div className="column waiting">
           <h2>Waiting</h2>
-          {filteredTasks.filter(task => task.status === 'waiting').map(renderTask)}
+          {filteredTasks
+            .filter((task) => task.status && task.status[0] === "waiting")
+            .map(renderTask)}
         </div>
         <div className="column in-progress">
           <h2>In Progress</h2>
-          {filteredTasks.filter(task => task.status === 'in-progress').map(renderTask)}
+          {filteredTasks
+            .filter((task) => task.status && task.status[0] === "in-progress")
+            .map(renderTask)}
         </div>
         <div className="column completed">
           <h2>Completed</h2>
-          {filteredTasks.filter(task => task.status === 'completed').map(renderTask)}
+          {filteredTasks
+            .filter((task) => task.status && task.status[0] === "completed")
+            .map(renderTask)}
         </div>
       </div>
 
@@ -339,7 +368,12 @@ const TaskBoard: React.FC = () => {
               <input
                 type="text"
                 value={currentTask.description}
-                onChange={(e) => setCurrentTask({ ...currentTask, description: e.target.value })}
+                onChange={(e) =>
+                  setCurrentTask({
+                    ...currentTask,
+                    description: e.target.value,
+                  })
+                }
               />
             </label>
             <label htmlFor="dueDate">Due Date</label>
