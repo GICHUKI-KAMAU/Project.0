@@ -54,7 +54,7 @@ const tables = [
       },
       {
         name: "role",
-        type: "multiple",
+        type: "text",
         notNull: true,
         unique: false,
         defaultValue: null,

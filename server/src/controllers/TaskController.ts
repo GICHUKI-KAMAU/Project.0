@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { getXataClient } from '../xata';
 import { JwtPayload } from 'jsonwebtoken';
-import { verifyToken } from '../utils/jwtUtils'; // Ensure this function exists and properly verifies the JWT token
+import { verifyToken } from '../utils/jwtUtils'; 
 
 const xata = getXataClient();
 
